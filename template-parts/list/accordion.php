@@ -69,4 +69,4 @@ foreach ($tableArray as $characterArray) :
 endforeach;
 
 /* close wrapper */
-?></div><?php
+?></div>
