@@ -31,21 +31,9 @@ get_header(null,
                                 <li data-target="#use-case-carousel" data-slide-to="0" class="active"></li>
                                 <li data-target="#use-case-carousel" data-slide-to="1"></li>
                                 <li data-target="#use-case-carousel" data-slide-to="2"></li>
-                                <li data-target="#use-case-carousel" data-slide-to="3"></li>
                             </ol>
                             <div class="carousel-inner">
                                 <div class="item active">
-                                    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/oes_1914_1918.jpg"
-                                         alt="1914">
-                                    <div class="carousel-caption">
-                                        <h3><a href="https://encyclopedia.1914-1918-online.net/home/"
-                                               target="_blank">1914-1918 Online</a></h3>
-                                        <p><a href="https://encyclopedia.1914-1918-online.net/home/"
-                                              target="_blank">International Encyclopedia<br>of the First World War</a>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="item">
                                     <img src="<?php echo get_template_directory_uri(); ?>/assets/images/oes_comdeg.jpg"
                                          alt="comdeg">
                                     <div class="carousel-caption">
