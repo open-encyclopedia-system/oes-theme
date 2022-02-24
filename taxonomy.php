@@ -1,59 +1,46 @@
 <?php
 
-/* get the title */
-$term = get_queried_object();
+global $is_index, $taxonomy, $term, $language, $oes;
+$is_index = in_array($taxonomy, $oes->theme_index['objects'] ?? []);
+
+/* get term object */
+$label = $oes->taxonomies[$taxonomy]['label_translations'][$language] ??
+    ($oes->taxonomies[$taxonomy]['label'] ?: (get_taxonomy($taxonomy)->labels->singular_name ?? 'Label missing'));
+
+$termID = get_term_by('slug', $term, $taxonomy)->term_id ?? false;
+$termObject = class_exists($taxonomy) ? new $taxonomy($termID) : new OES_Taxonomy($termID);
 
 
 /* display header ----------------------------------------------------------------------------------------------------*/
-get_header(null,
-    [
-        'head_text' => 'Keyword - ' . $term->name,
-        'header_text' => 'Author Keyword',
-        'subheader' => 'title',
-        'subheader_args' => ['wrapper_id' => 'single-post-header', 'subheader_title' => $term->name]
-    ]);
+get_header(null, ['head-text' => $termObject->title]);
 
 
 /* display main content ----------------------------------------------------------------------------------------------*/
 ?>
-<main id="with-subheader">
-    <div id="single-post" class="wrapper-main">
+    <main class="oes-smooth-loading">
+        <div class="oes-subheader">
+            <div class="container"><h3 class="oes-title-header"><?php echo $label; ?></h3></div>
+            <div class="oes-sub-subheader">
+                <div class="oes-max-width-888 container">
+                    <h3><?php echo $termObject->title; ?></h3><?php
 
-        <div class="details"><?php
-            if($term->description && !empty($term->description)) :?>
-                <h3>Description</h3><?php
-                echo $term->description;
-            endif;
-            ?>
-        </div><?php
-
-        /* get contributor relations ---------------------------------------------------------------------------------*/
-        global $tableData;
-        get_template_part('includes/archive/archive-topic',
-            null,
-            [
-                'taxonomy' => 'oes_demo_tag_topic',
-                'term_id' => $term->term_id
-            ]
-        );
-
-        /* display relations -----------------------------------------------------------------------------------------*/
-        if($tableData):?>
-            <div>
-                <h3><?php _e('Connected Content', 'oes-demo');?></h3><?php
-
-                /* display details */
-                get_template_part('template-parts/table/details',
-                    null,
-                    ['table_data' => $tableData]); ?>
-            </div><?php
-        else:
-            _e('This topic has no related articles.', 'oes-demo');
-        endif;
-
-        ?>
-    </div>
-</main>
+                    /* add back to index button */
+                    if ($is_index) :?>
+                        <span class="oes-post-buttons">
+                        <button type="button" class="btn">
+                            <a href="<?php echo get_site_url(). '/'. ($oes->theme_index['slug'] ?? 'index') ?>/"><?php
+                                echo $oes->theme_labels['single__back_to_index_button'][$language] ?? 'Back to index'
+                                ?></a>
+                        </button>
+                        </span><?php
+                    endif;
+                    ?>
+                </div>
+            </div>
+        </div>
+        <div class="oes-single-post oes-max-width-888 container"><?php
+            echo $termObject->get_html_main(['language' => $language]); ?></div>
+    </main>
 <?php
 
 

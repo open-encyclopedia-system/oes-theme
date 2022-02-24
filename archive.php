@@ -1,137 +1,112 @@
 <?php
 
-use OES\Config as C;
-
-/* differentiate between post types ----------------------------------------------------------------------------------*/
-
-/* get global variable post type */
-global $post_type;
-$post_type_origin = get_post_type_object($post_type)->name;
-switch($post_type_origin){
+/* check if post type for index --------------------------------------------------------------------------------------*/
+global $post_type, $oes, $language, $oes_additional_objects, $is_index;
+if (!$is_index) $is_index = in_array($post_type, $oes->theme_index['objects'] ?? []);
 
 
-    /* ARTICLE -------------------------------------------------------------------------------------------------------*/
-    case OES_Project_Config::POST_TYPE_ARTICLE :
-
-        $headText = 'Articles';
-        $headerText = 'Articles';
-        $subheader = 'article-categories';
-        $subheaderArgs = ['section_id' => 'subheader'];
-        $emptyText = 'No meta data for this article.';
-        $titleField = 'oes_demo_article_title';
-        $checkForVersioning = true;
-        $checkForTranslation = true;
-        $checkForFilter = [
-            'global_variable' => 'category',
-            'compare_to_object' => 'term',
-            'term_slug' => 'oes_demo_tag_category',
-            'term_parameter' => 'slug',
-            'additional_value' => 'all',
-            'master' => true
-        ];
-        break;
-
-
-    /* CONTRIBUTOR ---------------------------------------------------------------------------------------------------*/
-    case OES_Project_Config::POST_TYPE_CONTRIBUTOR :
-
-        $headText = 'Contributors';
-        $headerText = 'Contributors';
-        $subheader = 'alphabet-filter';
-        $subheaderArgs = ['section_id' => 'subheader'];
-        $subSubheader = false;
-        $emptyText = 'No meta data for this author.';
-        $titleField = 'oes_demo_contributor_title';
-        break;
-
-
-    /* GLOSSARY ENTRIES ----------------------------------------------------------------------------------------------*/
-    case OES_Project_Config::POST_TYPE_GLOSSARY :
-
-        $headText = 'Glossary';
-        $headerText = 'Glossary';
-        $subheader = 'alphabet-filter';
-        $subheaderArgs = ['section_id' => 'subheader'];
-        $subSubheader = false;
-        $emptyText = 'No meta data for this glossary entry.';
-        $titleField = 'oes_demo_glossary_title';
-        $checkForTranslation = true;
-        break;
-
-
-    /* INDEX ---------------------------------------------------------------------------------------------------------*/
-    case OES_Project_Config::POST_TYPE_INDEX_PERSON :
-    case OES_Project_Config::POST_TYPE_INDEX_PLACE :
-    case OES_Project_Config::POST_TYPE_INDEX_TIME :
-    case OES_Project_Config::POST_TYPE_INDEX_SUBJECT :
-    case OES_Project_Config::POST_TYPE_INDEX_INSTITUTE :
-
-        $post_type = OES_Project_Config::POST_TYPE_INDEX_ANY;
-        $headText = 'Index';
-        $headerText = 'Index';
-        $subheader = 'navigation';
-        $subheaderArgs = ['section_id' => 'subheader'];
-        $emptyText = 'No meta data for this index.';
-        $titleField = 'oes_demo_index_title';
-        break;
-}
-
-
-/* prepare data ------------------------------------------------------------------------------------------------------*/
-get_template_part('includes/archive/archive',
-    null,
-    [
-        'post_type' => $post_type,
-        'title_field' => isset($titleField) ? $titleField : false,
-        'check_for_versioning' => isset($checkForVersioning) ? $checkForVersioning : false,
-        'check_for_translation' => isset($checkForTranslation) ? $checkForTranslation : false,
-        'check_for_filter' => isset($checkForFilter) ? $checkForFilter : false,
-    ]);
+/* do the loop -------------------------------------------------------------------------------------------------------*/
+$archive = new OES_Archive();
+if (!empty($oes_additional_objects)) $archive->set_additional_objects($oes_additional_objects);
+$tableArray = $archive->get_data_as_table();
+$alphabetArray = oes_archive_get_alphabet_filter($archive->characters);
+$filter = $archive->filter_array;
 
 
 /* display header ----------------------------------------------------------------------------------------------------*/
-get_header(null,
-    [
-        'head_text' => isset($headText) ? $headText : 'OES Demo',
-        'header_text' => isset($headerText) ? $headerText : 'OES Demo',
-        'subheader' => isset($subheader) ? $subheader : 'navigation',
-        'subheader_args' => isset($subheaderArgs) ? $subheaderArgs : [],
-        'sub_subheader' => isset($subSubheader) ? $subSubheader : 'alphabet-filter',
-        'sub_subheader_args' => isset($subheaderArgs) ? $subheaderArgs : [],
-    ]);
-
-
-/* get table data (prepare data for list/table display) --------------------------------------------------------------*/
-get_template_part('includes/table/table',
-    null,
-    [
-        'post_type' => $post_type,
-        'empty_text' => isset($emptyText) ? $emptyText : 'No further information.'
-    ]);
+get_header(null, ['head-text' => $archive->label]);
 
 
 /* display main content ----------------------------------------------------------------------------------------------*/
+?>
+    <script type="text/javascript">
+        var oes_filter = <?php echo json_encode($filter['json'] ?? []);?>
+    </script>
+    <main class="oes-smooth-loading">
+        <div class="oes-sidebar-filter-wrapper">
+            <div id="oes-sidebar-filter-panel"><?php
+                if (!empty($filter)) get_template_part('template-parts/sidebar', '', ['filter' => $filter]); ?>
+            </div>
+            <div class="oes-page-with-sidebar">
+                <div class="oes-subheader">
+                    <div class="container">
+                        <h3 class="oes-title-header"><?php echo $archive->label; ?></h3>
+                    </div>
+                </div>
+                <div class="oes-sub-subheader">
+                    <div class="container"><?php
 
-/* check for options for archive view */
-$archiveViewOptions = get_option(C\Option::THEME_TITLE . '-' . $post_type_origin . '-title');
-if($archiveViewOptions['display_archive_list']){
-    $listType = 'list';
-    $listWrapperID = 'archive-list-simple';
-    $listTableID = 'list-simple';
-    $wrapperID = 'archive-list-main';
-}
+                        /* optional alphabet subheader */
+                        if ((isset($archive->filter['alphabet']) && $archive->filter['alphabet']) ||
+                            !empty($oes_additional_objects)) {
+                            $alphabetList = '';
+                            foreach ($alphabetArray as $item) $alphabetList .= '<li>' . $item['content'] . '</li>';
+                            echo '<div class="oes-subheader-alphabet">' .
+                                '<ul class="oes-alphabet-list oes-horizontal-list">' . $alphabetList . '</ul></div>';
+                        }
 
-get_template_part('template-parts/list/' . (isset($listType) ? $listType : 'accordion'),
-    null,
-    [
-        'wrapper_id' => isset($listWrapperID) ? $listWrapperID : 'archive-list',
-        'wrapper_main_id' => isset($wrapperID) ? $wrapperID : 'archive',
-        'table_id' => isset($listTableID) ? $listTableID : false,
-        'accordion_id' => 'archive-list-icon',
-        'title_is_link' => true,
-        'add_alphabet' => true,
-        'display_table_args' => ['empty_text' => isset($emptyText) ? $emptyText : 'No further information.']
-    ]);
+                        /* optional index subheader */
+                        if ($is_index)
+                            get_template_part('template-parts/subheader', 'index',
+                                ['objects' => $oes->theme_index['objects'] ?? []]);
+
+                        /* optional active filters */
+                        if (!empty($filter)) : ?>
+                            <div class="oes-subheader-archive">
+                            <div class="oes-subheader-archive-wrapper">
+                                <button type="button" id="oes-filter-panel-button" class="btn"><?php
+                                    _e('Filter', 'oes'); ?></button>
+                            </div>
+                            </div><?php endif;
+
+
+                        /* add count */
+                        $archiveCount = (($archive->characters && sizeof($archive->characters) > 0 && $archive->count) ?
+                            $archive->count :
+                            false);
+                        if ($archiveCount):
+                            $labelSingular =
+                                $oes->post_types[$post_type]['theme_labels']['archive__entry'][$language] ?? 'Entry';
+                            $labelPlural =
+                                $oes->post_types[$post_type]['theme_labels']['archive__entries'][$language] ?? 'Entries';
+
+                            ?>
+                            <div class="oes-subheader-count">
+                            <span class="oes-archive-count-number"><?php
+                                echo $archiveCount . ' '; ?></span><span class="oes-archive-count-label-singular" <?php
+                            if ($archiveCount > 1) echo ' style="display:none";' ?>><?php
+                                echo $labelSingular; ?></span><span class="oes-archive-count-label-plural" <?php
+                            if ($archiveCount < 2) echo ' style="display:none";' ?>><?php
+                                echo $labelPlural; ?></span>
+                            </div><?php
+                        endif;
+                        ?>
+                    </div>
+                </div>
+                <div class="oes-active-filter-container">
+                    <div class="oes-active-filter-wrapper container">
+                        <ul class="oes-active-filter-container-list"><?php
+                        if (!empty($filter) && isset($filter['list']))
+                            foreach ($filter['list'] as $singleFilter => $ignore)
+                                echo '<li><ul class="oes-active-filter-' . $singleFilter .
+                                    ' oes-active-filter"></ul></li>';
+                            ?></ul>
+                    </div>
+                </div>
+                <div class="<?php echo $is_index ? 'oes-archive-container-index ' : '';
+                ?>oes-archive-container oes-max-width-888 container">
+                    <div class="oes-archive-container-no-entries"><?php
+                        _e('No entries found for this filter combination.', 'oes');?></div><?php
+                    echo get_template_part('template-parts/archive', 'list', [
+                        'data' => $tableArray,
+                        'add-alphabet' => false,
+                        'title-is-link' => !$archive->display_content
+                    ]);
+                    ?>
+                </div>
+            </div>
+    </main>
+<?php
 
 
 /* display footer ----------------------------------------------------------------------------------------------------*/

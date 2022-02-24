@@ -1,106 +1,61 @@
 <?php
 
-$postObject = null;
 
-/* differentiate between post types ----------------------------------------------------------------------------------*/
-global $post_type;
-switch(get_post_type_object($post_type)->name){
+/* check if post type for index --------------------------------------------------------------------------------------*/
+global $post_type, $post, $oes, $language, $index_post_types, $oes_post;
+$is_index = in_array($post_type, $oes->theme_index['objects'] ?? []);
 
-
-    /* ARTICLE -------------------------------------------------------------------------------------------------------*/
-    case OES_Project_Config::POST_TYPE_ARTICLE :
-
-        $postObject = new OES_Demo_Article();
-
-        /* check if print */
-        if (isset($_GET['print'])) {$postObject->create_pdf(); return;}
-
-        $headerText = 'Article';
-        $subheaderArgs = [
-            'wrapper_id' => 'single-post-header',
-            'include_print' => true,
-            'include_translation' => $postObject->translationIDs ? $postObject->translationIDs : false,
-            'subheader_title' => $postObject->get_title(),
-        ];
-        break;
-
-
-    /* CONTRIBUTOR ---------------------------------------------------------------------------------------------------*/
-    case OES_Project_Config::POST_TYPE_CONTRIBUTOR :
-
-        $postObject = new OES_Demo_Contributor();
-        $headerText = 'Contributor';
-        $subheaderArgs = [
-            'wrapper_id' => 'single-post-header',
-            'include_back_link' => $_SERVER['HTTP_REFERER'],
-            'include_back_text' =>
-                ($_SERVER['HTTP_REFERER'] ==
-                    get_post_type_archive_link(OES_Project_Config::POST_TYPE_CONTRIBUTOR)) ?
-                __('Back to Contributors', 'oes-demo') :
-                __('Back', 'oes-demo'),
-            'subheader_title' => $postObject->get_title()
-        ];
-        break;
-
-
-    /* GLOSSARY ------------------------------------------------------------------------------------------------------*/
-    case OES_Project_Config::POST_TYPE_GLOSSARY :
-
-        $postObject = new OES_Demo_Glossary();
-        $headerText = 'Glossary Entry';
-        $subheaderArgs = [
-            'wrapper_id' => 'single-post-header',
-            'subheader_title' => $postObject->get_title(),
-            'include_translation' => $postObject->translationIDs ? $postObject->translationIDs : false,
-        ];
-        break;
-
-
-    /* INDEX ---------------------------------------------------------------------------------------------------------*/
-    case OES_Project_Config::POST_TYPE_INDEX_PERSON :
-    case OES_Project_Config::POST_TYPE_INDEX_PLACE :
-    case OES_Project_Config::POST_TYPE_INDEX_TIME :
-    case OES_Project_Config::POST_TYPE_INDEX_SUBJECT :
-    case OES_Project_Config::POST_TYPE_INDEX_INSTITUTE :
-
-        /* get index identifier 'person', 'place', 'time' or 'subject' for header */
-        $identifier = OES_Project_Config::POST_TYPE_IDENTIFIER;
-        $headerText = isset($identifier[get_post_type()]) ? $identifier[get_post_type()] : 'post';
-
-        $postObject = new OES_Demo_Index(false, get_post_type());
-
-        $indexArchives = [
-            get_permalink(get_page_by_path('oes-demo-index')),
-            get_post_type_archive_link(OES_Project_Config::POST_TYPE_INDEX_PERSON),
-            get_post_type_archive_link(OES_Project_Config::POST_TYPE_INDEX_PLACE),
-            get_post_type_archive_link(OES_Project_Config::POST_TYPE_INDEX_TIME),
-            get_post_type_archive_link(OES_Project_Config::POST_TYPE_INDEX_SUBJECT),
-            get_post_type_archive_link(OES_Project_Config::POST_TYPE_INDEX_INSTITUTE),
-        ];
-
-        $subheaderArgs = [
-            'wrapper_id' => 'single-post-header',
-            'include_back_link' => $_SERVER['HTTP_REFERER'],
-            'include_back_text' => (in_array($_SERVER['HTTP_REFERER'], $indexArchives)) ?
-                __('Back to Index', 'oes-demo') :
-                __('Back', 'oes-demo'),
-            'subheader_title' => $postObject->get_title(),
-        ];
-}
-
+/* get post object (prepare rendered content to derive table of content etc) */
+$oes_post = class_exists($post_type) ? new $post_type(get_the_ID(), $language) : new OES_Post(get_the_ID(), $language);
+$label = $oes->post_types[$post_type]['label_translations'][$language] ?: ($oes->post_types[$post_type]['label'] ??
+        (get_post_type_object($post_type)->labels->singular_name ?? 'Label missing'));
 
 /* display header ----------------------------------------------------------------------------------------------------*/
-get_header(null,
-    [
-        'head_text' => $postObject->get_title(),
-        'header_text' => isset($headerText) ? $headerText : $postObject->get_title(),
-        'subheader' => isset($subheader) ? $subheader : 'title',
-        'subheader_args' => isset($subheaderArgs) ? $subheaderArgs : [],
-    ]);
+get_header(null, ['head-text' => $oes_post->get_title()]);
 
 
 /* display main content ----------------------------------------------------------------------------------------------*/
-echo $postObject->get_html_main(['include-wrapper' => true]);
+?>
+    <main class="oes-smooth-loading">
+        <div class="oes-subheader">
+            <div class="container"><h3 class="oes-title-header"><?php echo $label; ?></h3></div>
+            <div class="oes-sub-subheader">
+                <div class="oes-max-width-888 container">
+                    <h3><?php echo $oes_post->get_title(); ?></h3><?php
+
+                    /* add language switch */
+                    if ($oes_post->translations && isset($oes_post->translations[0]['id'])):
+                        foreach ($oes_post->translations as $translation):
+                            if (isset($translation['id'])) :?>
+                                <span class="oes-post-buttons">
+                                <button type="button" id="oes-language-switch-button" class="btn">
+                            <a href="<?php echo get_permalink($translation['id']); ?>"><?php
+                                echo $oes->languages[$translation['language']]['label'] ?: 'Language'; ?></a>
+                        </button>
+                                </span><?php
+                            endif;
+                        endforeach;
+                    endif;
+
+                    /* add back to index button */
+                    if ($is_index) :?>
+                        <span class="oes-post-buttons">
+                        <button type="button" class="btn">
+                            <a href="<?php echo get_site_url() . '/' . ($oes->theme_index['slug'] ??
+                                    __('index', 'oes')) ?>/"><?php
+                                echo $oes->theme_labels['single__back_to_index_button'][$oes_post->language] ??
+                                    __('Back to index', 'oes')
+                                ?></a>
+                        </button>
+                        </span><?php
+                    endif;
+                    ?>
+                </div>
+            </div>
+        </div>
+        <div class="oes-single-post oes-max-width-888 container"><?php the_content(); ?></div>
+    </main>
+<?php
 
 
 /* display footer ----------------------------------------------------------------------------------------------------*/
