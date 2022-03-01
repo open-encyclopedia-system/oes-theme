@@ -14,7 +14,6 @@ function oes_theme_action_after_setup_theme()
 
     /* Enable styling for editor (block css) */
     add_theme_support('editor-styles');
-    add_editor_style(get_template_directory_uri() . '/assets/css/oes-editor.css');
 
     /* Register menus */
     register_nav_menus([
@@ -30,9 +29,6 @@ function oes_theme_action_after_setup_theme()
 
     /* Modify WordPress search to use OES Feature "Search" */
     if (function_exists('oes_theme_modify_search')) oes_theme_modify_search();
-
-    /* Modify gnd display */
-    if (function_exists('oes_theme_gnd_display_modified_table')) oes_theme_gnd_display_modified_table();
 }
 
 
@@ -100,9 +96,41 @@ function oes_theme_action_template_redirect()
     $currentURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") .
         "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
+    $switch = $_GET['oes-language-switch'] ?? false;
+
+
+    /**
+     * Fires before theme redirection.
+     *
+     * @param string $currentURL The current url.
+     * @param string $language The current language.
+     * @param bool $switch The language switch.
+     */
+    do_action('oes/theme_redirect_index', $currentURL, $language, $switch);
+
+
     /* redirect single for post types where archive are displayed as full list */
     if (!is_admin()) {
-        if (is_single() && $oes->post_types) {
+
+        /* check if page switch */
+        if($switch && is_page()){
+
+            /* check for translations */
+            global $post;
+            $translations = \OES\ACF\oes_get_field('field_oes_page_translations', $post->ID);
+            if(!empty($translations))
+                foreach($translations as $translationID){
+                    $pageLanguage = oes_get_post_language($translationID);
+                    if($pageLanguage && $pageLanguage === $switch){
+                        if(is_front_page()){
+                            global $post;
+                            $post = get_post($translationID);
+                        }
+                        else wp_safe_redirect(get_permalink($translationID));
+                    }
+                }
+        }
+        elseif (is_single() && $oes->post_types) {
 
             /* check if archive is "flat" */
             global $post;
@@ -122,15 +150,16 @@ function oes_theme_action_template_redirect()
             }
 
         } elseif ($oes->taxonomies) {
-            foreach ($oes->taxonomies as $taxonomyKey => $singleTaxonomy){
+            foreach ($oes->taxonomies as $taxonomyKey => $singleTaxonomy) {
 
                 /* add action for taxonomy single pages */
-                if(has_action('oes/theme_redirect_taxonomy'))
+                if (has_action('oes/theme_redirect_taxonomy'))
                     do_action('oes/theme_redirect_taxonomy', $taxonomy);
 
                 /* Archive pages */
                 if (isset($singleTaxonomy['rewrite']['slug']) &&
-                    $currentURL === get_site_url() . '/' . $singleTaxonomy['rewrite']['slug'] . '/') {
+                    $currentURL === get_site_url() . '/' . $singleTaxonomy['rewrite']['slug'] . '/' &&
+                    !is_page($singleTaxonomy['rewrite']['slug'])) {
 
                     global $oes_additional_objects, $is_index;
                     if ($oes_additional_objects = [$taxonomyKey]) {

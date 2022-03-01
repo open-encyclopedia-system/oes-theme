@@ -31,13 +31,15 @@ $(document).ready(function () {
             amount = filter_container.children('.oes-alphabet-container').children(':visible').length;
 
             /* update count */
-            count[0].innerText = amount + ' ';
-            if (amount === 1) {
-                $(".oes-archive-count-label-singular").show();
-                $(".oes-archive-count-label-plural").hide();
-            } else {
-                $(".oes-archive-count-label-singular").hide();
-                $(".oes-archive-count-label-plural").show();
+            if(count[0]){
+                count[0].innerText = amount + ' ';
+                if (amount === 1) {
+                    $(".oes-archive-count-label-singular").show();
+                    $(".oes-archive-count-label-plural").hide();
+                } else {
+                    $(".oes-archive-count-label-singular").hide();
+                    $(".oes-archive-count-label-plural").show();
+                }
             }
         }
 
@@ -55,9 +57,9 @@ let current_post_ids = [];
 function oesFilterProcessing(filter, type){
 
     /* add filter to active list */
-    const sidebar_filter = $(".oes-archive-filter-" + filter),
+    const sidebar_filter = $(".oes-archive-filter-" + type + "-" + filter),
     name = sidebar_filter[0].childNodes[0].data;
-    $(".oes-active-filter-"+type).append('<li><a class="oes-active-filter-item oes-active-filter-item-' + type +
+    $(".oes-active-filter-" + type).append('<li><a class="oes-active-filter-item oes-active-filter-item-' + type +
         ' oes-active-filter-item-' + filter +
         '" href="javascript:void(0)" data-filter="' + filter + '"' +
         'onClick=oesRemoveActiveFilter(\'' + filter + '\',\'' + type + '\')><span>' +
@@ -86,7 +88,7 @@ function oesRemoveActiveFilter(filter_inner, type_inner){
     active_filter_item.parent().remove();
 
     /* show in sidebar */
-    $(".oes-archive-filter-" + filter_inner).parent().toggleClass("active");
+    $(".oes-archive-filter-" + type_inner + "-" + filter_inner).parent().toggleClass("active");
 
     /* remove data from current post_ids */
     if (current_post_ids.hasOwnProperty(type_inner)) {
@@ -132,7 +134,7 @@ function oesClearAllFilter(){
     count_container.hide();
 
     /* update count */
-    count[0].innerText = amount + ' ';
+    if(count[0]) count[0].innerText = amount + ' ';
 
     if(amount === 0) $(".oes-archive-container-no-entries").show();
     else $(".oes-archive-container-no-entries").hide();

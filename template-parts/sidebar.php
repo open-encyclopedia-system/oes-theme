@@ -19,11 +19,12 @@
                         $filterItemsList .=
                             sprintf('<li class="oes-archive-filter-item"><a href="javascript:void(0)" data-filter="%s" ' .
                                 'data-name="%s" data-type="%s"' .
-                                ' class="oes-archive-filter-%s oes-archive-filter" '.
+                                ' class="oes-archive-filter-%s-%s oes-archive-filter" '.
                                 'onClick="oesFilterProcessing(\'%s\', \'%s\')">%s' .
                                 '<span class="oes-filter-item-count">%s</span></a></li>',
                                 $itemKey,
                                 $itemLabel,
+                                $filterKey,
                                 $filterKey,
                                 $itemKey,
                                 $itemKey,

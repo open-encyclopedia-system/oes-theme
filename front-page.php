@@ -1,8 +1,9 @@
 <?php
 
 /* skip OES rendering */
-global $oes_frontpage;
+global $language, $oes_frontpage, $post;
 $oes_frontpage = true;
+$language = oes_get_post_language($post->ID) ?? 'language0';
 
 
 /* display header ----------------------------------------------------------------------------------------------------*/
