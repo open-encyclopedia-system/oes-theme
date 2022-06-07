@@ -1,11 +1,8 @@
 <?php
-
-global $post_type, $post, $oes, $language, $index_post_types, $oes_post, $is_index;
-
-/* display main content ----------------------------------------------------------------------------------------------*/
+global $oes, $oes_post, $oes_is_index;
 ?>
 <div class="oes-subheader">
-    <div class="container"><h3 class="oes-title-header"><?php echo $args['label'] ?? 'Label missing'; ?></h3></div>
+    <div class="oes-max-width-888 container"><h3 class="oes-title-header"><?php echo $args['label'] ?? 'Label missing'; ?></h3></div>
     <div class="oes-sub-subheader">
         <div class="oes-max-width-888 container">
             <h3><?php echo $oes_post->get_title(); ?></h3><?php
@@ -25,15 +22,14 @@ global $post_type, $post, $oes, $language, $index_post_types, $oes_post, $is_ind
             endif;
 
             /* add back to index button */
-            if ($is_index) :?>
+            if ($oes_is_index) :?>
                 <span class="oes-post-buttons">
                 <button type="button" class="btn">
-                            <a href="<?php echo get_site_url() . '/' . ($oes->theme_index['slug'] ??
-                                    __('index', 'oes')) ?>/"><?php
-                                echo $oes->theme_labels['single__back_to_index_button'][$oes_post->language] ??
-                                    __('Back to index', 'oes')
-                                ?></a>
-                        </button>
+                    <a href="<?php
+                    echo(get_site_url() . '/' . ($oes->theme_index['slug'] ?? __('index', 'oes'))); ?>/"><?php
+                        echo($oes->theme_labels['single__back_to_index_button'][$oes_post->language] ??
+                            __('Back to index', 'oes')); ?></a>
+                </button>
                 </span><?php
             endif;
             ?>

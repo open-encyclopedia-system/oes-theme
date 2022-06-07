@@ -1,37 +1,38 @@
 <?php
-global $post_type;
+global $post_type, $oes_archive_data, $oes_archive_alphabet_initial, $oes_archive_skipped_posts;
+if (!$oes_archive_skipped_posts) $oes_archive_skipped_posts = [];
 
 /* display empty results */
-$tableArray = $args['data'] ?? [];
+$tableArray = $oes_archive_data['table-array'] ?? [];
 if (empty($tableArray) || count($tableArray) == 0) : echo 'No results';
 
-/* loop through table data ---------------------------------------------------------------------------------------*/
+/* loop through table data -------------------------------------------------------------------------------------------*/
 else:
-    foreach ($tableArray as $characterArray) :?>
-        <div class="oes-archive-wrapper filter-<?php echo($characterArray['character'] === "#" ?
+    foreach ($tableArray as $characterArray) {
+
+        $thisCharacter = $characterArray['character'] === "#" ?
             'other' :
-            strtolower($characterArray['character'])); ?>"><?php
+            strtolower($characterArray['character']);
 
-        /* add initial character */
-        if (isset($args['add-alphabet']) && $args['add-alphabet'] && isset($characterArray['character'])) :?>
-            <div class="oes-alphabet-initial"><?php echo $characterArray['character']; ?></div><?php
-        endif;
+        /* optional: add additional character */
+        $alphabetInitialString = '';
+        if ($oes_archive_alphabet_initial && isset($characterArray['character']))
+            $alphabetInitialString .= '<div class="oes-alphabet-initial">' . $characterArray['character'] . '</div>';
 
-        /* add container for character */
-        ?>
-        <div class="oes-alphabet-container"><?php
 
-            /* loop through entries */
-            foreach ($characterArray['table'] as $row) {
+        /* loop through entries */
+        $containerString = '';
+        foreach ($characterArray['table'] as $row)
+            if (isset($row['id']) && !in_array($row['id'], $oes_archive_skipped_posts)) {
 
                 /* check if title is link */
-                $title = (isset($args['title-is-link']) && $args['title-is-link']) ?
-                    sprintf('<a href="%s" class="oes-archive-title">%s</a>',
-                        $row['permalink'],
-                        $row['title']
-                    ) :
+                $title = ($oes_archive_data['archive']['display_content'] ?? false) ?
                     sprintf('<span class="oes-archive-title" id="%s">%s</span>',
                         $post_type . '-' . $row['id'],
+                        $row['title']
+                    ) :
+                    sprintf('<a href="%s" class="oes-archive-title">%s</a>',
+                        $row['permalink'],
                         $row['title']
                     );
 
@@ -55,22 +56,27 @@ else:
 
                 /* display row with preview */
                 if ($previewTable)
-                    printf('<div class="oes-post-filter-wrapper oes-post-filter-%s">' .
+                    $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-filter-%s">' .
                         '<a href="#row%s" data-toggle="collapse" aria-expanded="false" class="oes-archive-plus"></a>' .
                         '%s<table class="oes-archive-table collapse" id="row%s">%s</table></div>',
                         $row['id'],
                         $row['id'],
-                        $title . $row['additional'] . $content,
+                        $title . (is_string($row['additional']) ? $row['additional'] : '') . $content,
                         $row['id'],
                         $previewTable);
-                else
-                    printf('<div class="oes-post-filter-wrapper oes-post-filter-%s">%s</div>',
+                elseif (!isset($args['skip-empty']) || !$args['skip-empty'])
+                    $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-filter-%s">%s</div>',
                         $row['id'],
-                        $title . (empty($row['additional']) ? '' : $row['additional']) . $content
+                        $title . (empty($row['additional']) || !is_string($row['additional']) ? '' : $row['additional']) . $content
                     );
             }
-            ?>
-        </div>
-        </div><?php
-    endforeach;
+
+        printf('<div class="oes-archive-wrapper filter-%s" data-alphabet="%s">%s' .
+            '<div class="oes-alphabet-container">%s</div>' .
+            '</div>',
+            $thisCharacter,
+            $thisCharacter,
+            $alphabetInitialString,
+            $containerString);
+    }
 endif;

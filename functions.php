@@ -51,11 +51,6 @@ function oes_theme_action_enqueue_scripts()
     wp_enqueue_style('oes-style', get_stylesheet_uri(), []);
 
     /* enqueue scripts */
-    wp_enqueue_script('jquery');
-    wp_register_script('oes-jquery',
-        get_template_directory_uri() . '/assets/js/jquery.min.js');
-    wp_enqueue_script('oes-jquery');
-
     wp_register_script('bootstrap',
         get_template_directory_uri() . '/assets/js/bootstrap.min.js',
         ['jquery'],
@@ -70,12 +65,20 @@ function oes_theme_action_enqueue_scripts()
         true);
     wp_enqueue_script('oes');
 
-    wp_register_script('oes-filter',
-        get_template_directory_uri() . '/assets/js/oes-filter.js',
+    wp_register_script('oes-search',
+        get_template_directory_uri() . '/assets/js/oes-search.js',
         ['jquery'],
         false,
         true);
-    wp_enqueue_script('oes-filter');
+    wp_localize_script(
+        'oes-search',
+        'oesSearchAJAX',
+        [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'ajax_nonce' => wp_create_nonce('oes_search_nonce')
+        ]
+    );
+    wp_enqueue_script('oes-search');
 }
 
 
@@ -89,8 +92,8 @@ function oes_theme_action_template_redirect()
 {
 
     /* get global parameter */
-    global $oes, $language, $taxonomy;
-    $language = $oes->main_language;
+    global $oes, $oes_language, $taxonomy;
+    $oes_language = sizeof($oes->languages) < 2 ? 'all' : $oes->main_language;
 
     /* get current link*/
     $currentURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") .
@@ -103,34 +106,32 @@ function oes_theme_action_template_redirect()
      * Fires before theme redirection.
      *
      * @param string $currentURL The current url.
-     * @param string $language The current language.
+     * @param string $oes_language The current language.
      * @param bool $switch The language switch.
      */
-    do_action('oes/theme_redirect_index', $currentURL, $language, $switch);
+    do_action('oes/theme_redirect_index', $currentURL, $oes_language, $switch);
 
 
     /* redirect single for post types where archive are displayed as full list */
     if (!is_admin()) {
 
         /* check if page switch */
-        if($switch && is_page()){
+        if ($switch && is_page()) {
 
             /* check for translations */
             global $post;
             $translations = \OES\ACF\oes_get_field('field_oes_page_translations', $post->ID);
-            if(!empty($translations))
-                foreach($translations as $translationID){
+            if (!empty($translations))
+                foreach ($translations as $translationID) {
                     $pageLanguage = oes_get_post_language($translationID);
-                    if($pageLanguage && $pageLanguage === $switch){
-                        if(is_front_page()){
+                    if ($pageLanguage && $pageLanguage === $switch) {
+                        if (is_front_page()) {
                             global $post;
                             $post = get_post($translationID);
-                        }
-                        else wp_safe_redirect(get_permalink($translationID));
+                        } else wp_safe_redirect(get_permalink($translationID));
                     }
                 }
-        }
-        elseif (is_single() && $oes->post_types) {
+        } elseif (is_single() && $oes->post_types) {
 
             /* check if archive is "flat" */
             global $post;
@@ -143,9 +144,10 @@ function oes_theme_action_template_redirect()
         } /* redirect to index page */
         elseif ($currentURL === get_site_url() . '/' . ($oes->theme_index['slug'] ?? 'index') . '/') {
 
-            global $oes_additional_objects, $is_index;
+            global $oes_additional_objects, $oes_is_index, $oes_is_index_page;
             if ($oes_additional_objects = $oes->theme_index['objects'] ?? false) {
-                $is_index = true;
+                $oes_is_index = true;
+                $oes_is_index_page = true;
                 if (locate_template('archive.php', true)) exit();
             }
 
@@ -154,16 +156,16 @@ function oes_theme_action_template_redirect()
 
                 /* add action for taxonomy single pages */
                 if (has_action('oes/theme_redirect_taxonomy'))
-                    do_action('oes/theme_redirect_taxonomy', $taxonomy);
+                    do_action('oes/theme_redirect_taxonomy', $taxonomyKey, $singleTaxonomy, $currentURL);
 
                 /* Archive pages */
                 if (isset($singleTaxonomy['rewrite']['slug']) &&
                     $currentURL === get_site_url() . '/' . $singleTaxonomy['rewrite']['slug'] . '/' &&
                     !is_page($singleTaxonomy['rewrite']['slug'])) {
 
-                    global $oes_additional_objects, $is_index;
+                    global $oes_additional_objects, $oes_is_index;
                     if ($oes_additional_objects = [$taxonomyKey]) {
-                        $is_index = true;
+                        $oes_is_index = true;
                         if (locate_template('archive.php', true)) exit();
                     }
                 }
@@ -186,9 +188,43 @@ add_action('wp_nav_menu_items', 'oes_theme_action_wp_nav_menu_items', 10, 2);
 function oes_theme_action_wp_nav_menu_items(string $items, stdClass $menu): string
 {
     if ($menu->theme_location == 'oes-header-menu') {
-        global $language, $oes;
+        global $oes_language, $oes;
+        $consideredLanguage = $oes_language === 'all' ? 'language0' : $oes_language;
         return $items .
-            oes_theme_add_search_to_navigation($oes->theme_labels['search__navigation__label'][$language] ?? '');
+            oes_theme_add_search_to_navigation($oes->theme_labels['search__navigation__label'][$consideredLanguage] ?? 'SEARCH');
     }
     return $items;
 }
+
+
+/**
+ * Display the loading spinner
+ */
+function oes_theme_loading_spinner()
+{
+    echo '<div class="oes-loading-spinner-wrapper">' .
+        '<div class="oes-loading-spinner-wrapper"></div>' .
+        '<div id="oes-loading-spinner">' .
+        '<div class="oes-loading-spinner-bar1"></div>' .
+        '<div class="oes-loading-spinner-bar2"></div>' .
+        '<div class="oes-loading-spinner-bar3"></div>' .
+        '<div class="oes-loading-spinner-bar4"></div>' .
+        '<div class="oes-loading-spinner-bar5"></div>' .
+        '</div>' .
+        '</div>';
+}
+
+
+/* fetch search result after page is loaded */
+add_action('wp_ajax_oes_fetch_search_result_data', 'oes_fetch_search_result_data');
+add_action('wp_ajax_nopriv_oes_fetch_search_result_data', 'oes_fetch_search_result_data');
+
+/**
+ * Fetch search result data
+ */
+function oes_fetch_search_result_data()
+{
+    get_template_part('template-parts/search', 'content');
+    die();
+}
+

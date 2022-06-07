@@ -26,14 +26,10 @@
                      class="oes-home-img">
             </picture>
         </a>
-        <button class="navbar-toggler" type="button" data-trigger="#oes-main-nav">
-            <span role="button"><i class="fa fa-bars" aria-hidden="true"></i></span>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#oes-main-nav" aria-controls="oes-main-nav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="navbar-collapse" id="oes-main-nav">
-            <div class="offcanvas-header mt-3">
-                <button class="offcanvas-close btn btn-close float-right"><i class="fa fa-close"></i></button>
-            </div>
-            <?php
+        <div class="collapse navbar-collapse" id="oes-main-nav"><?php
             wp_nav_menu([
                 'theme_location' => 'oes-header-menu',
                 'container' => false,
@@ -47,17 +43,14 @@
 <div id="oes-search-panel" <?php if (isset($args['show-search']) && $args['show-search']) echo 'style="display:block;"'; ?>>
     <div class="oes-search-panel-background"></div>
     <div class="oes-search-panel-front">
-        <div class="container">
-            <button type="button" id="oes-search-panel-close" class="oes-close-contrast btn"></button>
-        </div>
         <div class="oes-search-panel-form container text-center">
             <h1><?php
 
                 /* get global parameters and OES instance parameter*/
-                global $language, $oes;
+                global $oes_language, $oes;
 
                 if(isset($args['search-text']) && $args['search-text']) echo $args['search-text'];
-                else echo ($oes->theme_labels['search__navigation__text'][$language] ??
+                else echo ($oes->theme_labels['search__navigation__text'][$oes_language] ??
                     __('Search the OES Encyclopedia', 'oes'));?></h1>
             <div><?php get_search_form(); ?></div>
         </div>
