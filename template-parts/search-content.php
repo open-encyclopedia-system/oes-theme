@@ -1,29 +1,36 @@
 <?php
-global $oes_search, $oes_language, $oes_archive_count;
-if(isset($_POST['search_params'])) $oes_search = oes_search_get_results($_POST['search_params'] ?? []);
-if(!$oes_language) $oes_language = $oes_search['language'] ?? 'language0';
+global $oes, $oes_search, $oes_language, $oes_archive_count, $oes_filter;
+if (isset($_POST['search_params'])) $oes_search = oes_search_get_results($_POST['search_params'] ?? []);
+if (!$oes_language) $oes_language = $oes_search['language'] ?? 'language0';
 $oes_archive_count = $oes_search['count'] ?? false;
-
-?><div class="oes-sub-subheader">
-    <div class="container"><?php
-
-        /* optional post type filters */
-        echo do_shortcode('[oes_post_type_filter type="default"]');
-
-        /* add count */
-        $oes_is_search = true;
-        echo do_shortcode('[oes_archive_count type="default"]');
-        ?>
-    </div>
-</div><?php
-
-/* display filter */
-if (isset($oes_search['filter_array']) && !empty($oes_search['filter_array']))
-    get_template_part('template-parts/search', 'active-filter');
+$oes_filter = $oes_search['filter_array'];
+$oes_is_search = true;
 
 ?>
-<div class="oes-archive-container oes-max-width-888 container"><?php
+<div class="oes-background-white-slim">
+    <div class="oes-archive-container container">
+        <div class="row gx-5">
+            <div class="oes-title-header-wrapper oes-archive-container-list oes-main-content col-12 col-lg-8 mt-5"><?php
 
-    get_template_part('template-parts/search', 'list');
-    ?>
+                get_template_part('template-parts/search', 'list-before');
+
+                get_template_part('template-parts/search', 'list');
+
+                get_template_part('template-parts/search', 'list-after');
+
+                ?>
+            </div>
+            <div class="oes-sidebar-with-toggle oes-sidebar col-12 col-lg-4 mt-5"><?php
+
+                get_template_part('template-parts/search', 'sidebar');
+
+                ?>
+            </div>
+        </div>
+    </div>
 </div>
+<script type="text/javascript">
+    let oes_filter = <?php echo json_encode($oes_search['filter_array']['json'] ?? []);?>;
+    localStorage.setItem('oesDisplayedIds', <?php echo json_encode($oes_search['post_ids'] ?? [])?>);
+    localStorage.setItem('oesSearchResultsURL', <?php echo json_encode(get_search_link($oes_search['search_term'] ?? '')); ?>);
+</script>

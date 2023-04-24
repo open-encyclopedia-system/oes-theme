@@ -1,27 +1,31 @@
-<?php
-global $oes_is_index, $oes_archive_data;
-?>
 <div class="oes-sidebar-filter-wrapper">
-    <div id="oes-sidebar-filter-panel"><?php
-        if (!empty($oes_archive_data['archive']['filter_array']))
-            get_template_part('template-parts/sidebar'); ?>
-    </div>
     <div class="oes-page-with-sidebar"><?php
 
-        /* get title */
         get_template_part('template-parts/archive', 'title');
 
-        /* add div for active filter */
-        echo '<div class="oes-active-filter-wrapper container">' .
-            do_shortcode('[oes_active_filter type="default"]') . '</div>';
-
         ?>
-        <div class="<?php echo $oes_is_index ? 'oes-archive-container-index ' : '';
-        ?>oes-archive-container oes-max-width-888 container">
-            <div class="oes-archive-container-no-entries"><?php
-                _e('No entries found for this filter combination.', 'oes'); ?></div><?php
-            get_template_part('template-parts/archive', 'list');
-            ?>
+        <div class="oes-background-white-slim">
+            <div class="<?php global $oes_is_index;
+            echo $oes_is_index ? 'oes-archive-container-index ' : ''; ?>oes-archive-container container">
+                <div class="row gx-5">
+                    <div class="oes-title-header-wrapper oes-archive-container-list oes-main-content col-12 col-lg-8 mt-5"><?php
+
+                        get_template_part('template-parts/archive', 'list-before');
+
+                        get_template_part('template-parts/archive', 'list');
+
+                        get_template_part('template-parts/archive', 'list-after');
+
+                        ?>
+                    </div>
+                    <div class="oes-sidebar-with-toggle oes-sidebar col-12 col-lg-4 mt-5"><?php
+
+                        get_template_part('template-parts/archive', 'sidebar');
+
+                        ?>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

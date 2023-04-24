@@ -1,7 +1,7 @@
 jQuery(document).ready(function () {
     const result_div = jQuery('#oes-search-results');
     if (result_div.length > 0) {
-        oes_search_results['search_term'] = jQuery('#s').val();
+        oes_search_results['search_term_id'] = jQuery('#s').val();
         result_div.hide();
         jQuery.ajax({
             type: "POST",

@@ -1,21 +1,28 @@
-<div class="oes-subheader">
-    <div class="container"><h3 class="oes-title-header"><?php echo $args['label'] ?? 'Label missing'; ?></h3></div>
-    <div class="oes-sub-subheader">
-        <div class="oes-max-width-888 container">
-            <h3><?php echo $args['title'] ?? 'Term title missing'; ?></h3><?php
+<?php
+global $taxonomy, $oes, $oes_term, $oes_container_class, $oes_language;
 
-            /* add back to index button */
-            global $oes_is_index, $oes_language, $oes;
-            if ($oes_is_index) :?>
-                <span class="oes-post-buttons">
-                <button type="button" class="btn">
-                            <a href="<?php echo get_site_url() . '/' . ($oes->theme_index['slug'] ?? 'index') ?>/"><?php
-                                echo $oes->theme_labels['single__back_to_index_button'][$oes_language] ?? 'Back to index'
-                                ?></a>
-                        </button>
-                </span><?php
-            endif;
-            ?>
+/* Prepare archive link */
+$archiveLink = $taxonomy;
+if ($taxonomyObject = get_taxonomy($taxonomy))
+    $archiveLink = sprintf('<a href="%s">%s</a>',
+        (get_site_url() . '/' . $oes->taxonomies[$taxonomy]['rewrite']['slug'] . '/'),
+        ($oes->taxonomies[$taxonomy]['label_translations'][$oes_language] ??
+            ($oes->taxonomies[$taxonomy]['label_translations'][$oes_language] ??
+            ($oes->taxonomies[$taxonomy]['label'] ?: $taxonomyObject->label)))
+    );
+
+
+?>
+<div class="oes-subheader d-print-none">
+        <div class="oes-subheader-title-container">
+        <div class="<?php echo $oes_container_class ?? ''; ?>">
+            <div class="oes-page-title"><?php echo $archiveLink;?></div>
         </div>
-    </div>
+    </div><?php
+
+    if($oes_term->has_theme_subtitle && method_exists($oes_term, 'get_html_sub_header')):
+        echo $oes_term->get_html_sub_header();
+    endif;
+
+    ?>
 </div>

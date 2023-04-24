@@ -6,42 +6,40 @@ global $post_type, $oes_language, $oes, $oes_search;
 
 /* display empty results */
 $results = $oes_search['posts'] ?? [];
-if (empty($results) || count($results) == 0) : echo 'No results.';
+if (empty($results) || count($results) == 0) :
+    echo $oes->theme_labels['search__no_results'][$oes_language] ?? 'No results.';
 
 /* loop through table data -------------------------------------------------------------------------------------------*/
-else:
+else:?><div class="oes-search-archive-container"><?php
 
     /* sort results by occurrences */
     krsort($results);
-
-    ?>
-    <table class="oes-search-wrapper table">
-    <thead>
-    <tr>
-        <th colspan="2"><?php echo $oes->theme_labels['search__result_table__header_title'][$oes_language] ?? 'Title';?></th>
-        <th><?php echo $oes->theme_labels['search__result_table__header_type'][$oes_language] ?? 'Type';?></th>
-        <th><?php echo $oes->theme_labels['search__result_table__header_occurrences'][$oes_language] ?? 'Occurrences';?></th>
-    </tr>
-    </thead>
-    <?php
-    foreach ($results as $occurrences => $posts) :?>
-        <tbody><?php
-
-
-        /* add container for character */
+    foreach ($results as $occurrences => $posts) :
 
         /* loop through entries */
         ksort($posts);
+        $containerString = '';
         foreach ($posts as $row) {
 
-            /* check if title is link */
+            /* prepare title */
             $title = sprintf('<a href="%s" class="oes-archive-title">%s</a>',
                 $row['permalink'],
                 $row['occurrences']['title']['td'][0] ?? ($row['title'] ?: 'Title missing')
             );
-            if(!empty($row['version']))
-                $title .= '<span class="oes-search-result-version-info">(' .
-                     __('Version ', 'oes') . $row['version'] . ')</span>';
+
+            /* add version */
+            $additionalInfo = [];
+            if (!empty($row['version'])) $additionalInfo[] = __('Version ', 'oes') . $row['version'];
+
+            /* add language */
+            $postLanguage = $row['language'] ?: false;
+            if ($postLanguage) $additionalInfo[] = $oes->languages[$postLanguage]['label'] ?? $postLanguage;
+
+            /* add occurrences */
+            $additionalInfo[] = $occurrences . ' ' .
+                ($oes->theme_labels['search__result_table__header_occurrences'][$oes_language] ?? 'Occurrences');
+
+            $title .= '<span class="oes-search-result-version-info">(' . implode(' | ', $additionalInfo) . ')</span>';
 
             /* check for results */
             $resultsTable = false;
@@ -50,49 +48,39 @@ else:
                     if (isset($dataRow['th']))
                         foreach ($dataRow['th'] as $position => $singleOccurrence)
                             if (isset($dataRow['td'][$position])) {
-                                $resultsTable .= '<div class="oes-search-occurrence-type-container">' .
-                                    ($rowKey && in_array($rowKey, ['content', 'title']) ?
-                                        '' :
-                                        ('<strong>' . $singleOccurrence . '</strong>: ')) .
-                                    ($rowKey === 'title' ?
-                                        '<strong>' . $dataRow['td'][$position] . '</strong>' :
-                                        $dataRow['td'][$position]) .
-                                    '</div>';
+                                if ($rowKey === 'content')
+                                    $resultsTable .= '<tr><td colspan="2">' . $dataRow['td'][$position] . '</td></tr>';
+                                else $resultTable = '<tr>' .
+                                    '<th>' . $singleOccurrence . '</th>' .
+                                    '<td>' . $dataRow['td'][$position] . '</td></tr>';
                             }
 
             /* display row with results */
             if ($resultsTable)
-                printf('<tr class="oes-search-row-wrapper oes-post-filter-wrapper oes-post-filter-%s oes-post-type-filter oes-post-type-filter-%s">' .
-                    '<td><a href="#row%s" data-toggle="collapse" aria-expanded="false" class="oes-archive-plus"></a>%s</td>' .
-                    '<td></td><td>%s</td>' .
-                    '<td><a href="#row%s" data-toggle="collapse" aria-expanded="false" class="oes-search-occurrences">%s</a></td>' .
-                    '</tr>' .
-                    '<tr class="oes-search-data-row collapse" id="row%s"><td colspan="4">%s' .
-                    '<div class="oes-read-more-button-container"><span class="oes-read-more-button"><a href="%s">%s</a></span></div>' .
-                    '</td></tr>',
+                $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-%s oes-post-filter-%s oes-post-type-filter oes-post-type-filter-%s">' .
+                    '<a href="#row%s" data-toggle="collapse" aria-expanded="false" class="oes-archive-plus oes-toggle-down-before"></a>' .
+                    '%s<div class="oes-archive-table-wrapper collapse" id="row%s">' .
+                    '<table class="oes-archive-table oes-simple-table">%s' .
+                    '</table>' .
+                    '</div></div>',
+                    $postLanguage ?: 'all',
                     $row['id'],
                     $row['post_type'],
                     $row['id'],
-                    $title,
-                    $row['type'],
+                    $title . (is_string($row['additional']) ? $row['additional'] : ''),
                     $row['id'],
-                    $row['occurrences-count'] ?? 0,
-                    $row['id'],
-                    $resultsTable,
-                    $row['permalink'],
-                    $oes->theme_labels['general__read_more'][$oes_language] ?? 'Read more'
-                );
+                    $resultsTable);
             else
-                printf('<tr class="oes-search-row-wrapper oes-post-filter-wrapper oes-post-filter-%s">' .
-                    '<td>%s</td><td></td><td>%s</td><td>%s</td></tr>',
+                $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-%s oes-post-filter-%s">%s</div>',
+                    $postLanguage ?: 'all',
                     $row['id'],
-                    $title,
-                    $row['type'],
-                    $row['occurrences-count'] ?? 0
+                    $title . (empty($row['additional']) || !is_string($row['additional']) ? '' : $row['additional'])
                 );
         }
-        ?>
-        </tbody><?php
-    endforeach;
-    ?></table><?php
+
+        if (!empty($containerString))
+            printf('<div class="oes-search-archive-wrapper oes-archive-wrapper filter-%s">%s</div>',
+                $occurrences,
+                $containerString);
+    endforeach;?></div><?php
 endif;

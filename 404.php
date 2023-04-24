@@ -2,7 +2,7 @@
 
 
 /* display header ----------------------------------------------------------------------------------------------------*/
-global $oes, $oes_language;
+global $oes, $oes_language, $oes_container_class;
 get_header(null, [
     'head-text' => $oes->theme_labels['404__header'][$oes_language] ?? 'Page not found... :(',
     'show-search' => true,
@@ -14,7 +14,7 @@ get_header(null, [
 ?>
     <main class="oes-smooth-loading">
     <div class="oes-page-not-found">
-        <div class="oes-single-post oes-max-width-888 container"><?php
+        <div class="oes-single-post <?php echo $oes_container_class ?? '';?>"><?php
             echo $oes->theme_labels['404_page_content'][$oes_language] ?? 'Page not found... :('; ?></div>
     </div></main><?php
 

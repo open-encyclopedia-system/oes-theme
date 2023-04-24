@@ -1,54 +1,122 @@
 <?php
 
-/* setup theme by adding actions and filters */
+/* activate theme features */
 add_action('after_setup_theme', 'oes_theme_action_after_setup_theme');
+add_filter('init', 'oes_theme_set_language_cookie', 999);
+add_action('wp_enqueue_scripts', 'oes_theme_action_enqueue_scripts');
+add_action('widgets_init', 'oes_widget_init');
+
+/* prepare theme labels */
+add_filter('oes/prepare_theme_labels_oes_config', 'oes_theme_labels_oes_config');
+add_filter('oes/prepare_theme_labels_taxonomy', 'oes_theme_labels_object', 10, 2);
+add_filter('oes/prepare_theme_labels_post', 'oes_theme_labels_object', 10, 2);
+
+/* fetch search result after page is loaded */
+add_action('wp_ajax_oes_fetch_search_result_data', 'oes_fetch_search_result_data');
+add_action('wp_ajax_nopriv_oes_fetch_search_result_data', 'oes_fetch_search_result_data');
+
 
 /**
  * Set up the OES theme.
+ * @return void
  */
-function oes_theme_action_after_setup_theme()
+function oes_theme_action_after_setup_theme(): void
 {
 
     /* Widgets */
     add_theme_support('widgets');
 
+
     /* Enable styling for editor (block css) */
     add_theme_support('editor-styles');
 
+
     /* Register menus */
-    register_nav_menus([
-        'oes-header-menu' => 'OES Top',
-        'oes-footer-menu' => 'OES Footer',
-        'oes-logo-menu' => 'OES Logo'
-    ]);
-    add_theme_support('menu');
+    $menus = [];
+
+    /* prepare menu locations for all languages */
+    global $oes;
+    if (isset($oes->languages)) {
+        foreach ($oes->languages as $languageKey => $languageData) {
+            $menus = array_merge([
+                'oes-utility-menu-' . $languageKey => 'OES Utility (' . ($languageData['abb'] ?? $languageKey) . ')',
+                'oes-header-menu-' . $languageKey => 'OES Top (' . ($languageData['abb'] ?? $languageKey) . ')',
+                'oes-footer-menu-' . $languageKey => 'OES Footer (' . ($languageData['abb'] ?? $languageKey) . ')',
+                'oes-logo-menu-' . $languageKey => 'OES Logo (' . ($languageData['abb'] ?? $languageKey) . ')',
+                'oes-social-menu-' . $languageKey => 'OES Social (' . ($languageData['abb'] ?? $languageKey) . ')'
+            ],
+                $menus);
+        }
+    } else
+        $menus = [
+            'oes-utility-menu-language0' => 'OES Utility',
+            'oes-header-menu-language0' => 'OES Top',
+            'oes-footer-menu-language0' => 'OES Footer',
+            'oes-logo-menu-language0' => 'OES Logo',
+            'oes-social-menu-language0' => 'OES Social'
+        ];
+    ksort($menus);
+
+
+    /**
+     * Filters the menus before registration.
+     *
+     * @param array $menus The menus.
+     */
+    if (has_filter('oes/theme_menus'))
+        $menus = apply_filters('oes/theme_menus', $menus);
+
+    register_nav_menus($menus);
+
 
     /* Add fav icon for pages */
     if (function_exists('oes_theme_add_favicon'))
         oes_theme_add_favicon(get_template_directory_uri() . '/assets/images/favicon.ico');
 
-    /* Modify WordPress search to use OES Feature "Search" */
+
+    /* Modify the WordPress search to use OES Feature "Search" */
     if (function_exists('oes_theme_modify_search')) oes_theme_modify_search();
 }
 
 
-/* load styles and scripts */
-add_action('wp_enqueue_scripts', 'oes_theme_action_enqueue_scripts');
+/**
+ * Set up language cookie.
+ * @return void
+ */
+function oes_theme_set_language_cookie(): void
+{
+    if (isset($_GET['oes-language-switch']) || !isset($_COOKIE['oes_language'])) {
+        global $oes;
+        $newValue = $_GET['oes-language-switch'] ?? 'language0';
+        if (isset($oes->languages[$newValue]))
+            if (setcookie('oes_language', $newValue, time() + (30 * DAY_IN_SECONDS), '/')) {
+                global $oes_language_switched;
+                $oes_language_switched = $newValue;
+            }
+    }
+}
+
 
 /**
  * Load styles and scripts.
+ * @return void
  */
-function oes_theme_action_enqueue_scripts()
+function oes_theme_action_enqueue_scripts(): void
 {
-
     /* enqueue styles */
-    wp_register_style('font-awesome', get_template_directory_uri() . '/assets/css/font-awesome.css', []);
-    wp_enqueue_style('font-awesome');
-
-    wp_register_style('bootstrap', get_template_directory_uri() . '/assets/css/bootstrap.min.css', []);
+    wp_register_style('bootstrap', get_template_directory_uri() . '/assets/css/bootstrap.min.css');
     wp_enqueue_style('bootstrap');
 
-    wp_enqueue_style('oes-style', get_stylesheet_uri(), []);
+    wp_enqueue_style('oes-style', get_stylesheet_uri());
+
+    wp_register_style('oes-print', get_template_directory_uri() . '/assets/css/print.css');
+    wp_enqueue_style('oes-print');
+
+    wp_register_style('oes-scrolled', get_template_directory_uri() . '/assets/css/scrolled.css');
+    wp_enqueue_style('oes-scrolled');
+
+    wp_register_style('oes-responsive', get_template_directory_uri() . '/assets/css/responsive.css');
+    wp_enqueue_style('oes-responsive');
 
     /* enqueue scripts */
     wp_register_script('bootstrap',
@@ -64,6 +132,21 @@ function oes_theme_action_enqueue_scripts()
         false,
         true);
     wp_enqueue_script('oes');
+
+    global $post;
+    wp_register_script('oes-paging',
+        get_template_directory_uri() . '/assets/js/oes-paging.js',
+        ['jquery'],
+        false,
+        true);
+    wp_localize_script(
+        'oes-paging',
+        'oesPaging',
+        [
+            'current_id' => $post->ID ?? false
+        ]
+    );
+    wp_enqueue_script('oes-paging');
 
     wp_register_script('oes-search',
         get_template_directory_uri() . '/assets/js/oes-search.js',
@@ -82,142 +165,109 @@ function oes_theme_action_enqueue_scripts()
 }
 
 
-/* redirect templates */
-add_action('template_redirect', 'oes_theme_action_template_redirect');
-
 /**
- * Redirect templates
+ * Register sidebars
+ * @return void
  */
-function oes_theme_action_template_redirect()
+function oes_widget_init(): void
 {
+    register_sidebar([
+        'name' => 'Archive Sidebar',
+        'id' => 'oes-archive-sidebar']);
 
-    /* get global parameter */
-    global $oes, $oes_language, $taxonomy;
-    $oes_language = sizeof($oes->languages) < 2 ? 'all' : $oes->main_language;
+    register_sidebar([
+        'name' => 'Single Sidebar',
+        'id' => 'oes-single-sidebar']);
 
-    /* get current link*/
-    $currentURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") .
-        "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-
-    $switch = $_GET['oes-language-switch'] ?? false;
-
-
-    /**
-     * Fires before theme redirection.
-     *
-     * @param string $currentURL The current url.
-     * @param string $oes_language The current language.
-     * @param bool $switch The language switch.
-     */
-    do_action('oes/theme_redirect_index', $currentURL, $oes_language, $switch);
-
-
-    /* redirect single for post types where archive are displayed as full list */
-    if (!is_admin()) {
-
-        /* check if page switch */
-        if ($switch && is_page()) {
-
-            /* check for translations */
-            global $post;
-            $translations = \OES\ACF\oes_get_field('field_oes_page_translations', $post->ID);
-            if (!empty($translations))
-                foreach ($translations as $translationID) {
-                    $pageLanguage = oes_get_post_language($translationID);
-                    if ($pageLanguage && $pageLanguage === $switch) {
-                        if (is_front_page()) {
-                            global $post;
-                            $post = get_post($translationID);
-                        } else wp_safe_redirect(get_permalink($translationID));
-                    }
-                }
-        } elseif (is_single() && $oes->post_types) {
-
-            /* check if archive is "flat" */
-            global $post;
-            if (isset($oes->post_types[$post->post_type]['archive_on_single_page']) &&
-                $oes->post_types[$post->post_type]['archive_on_single_page']) {
-                wp_safe_redirect(
-                    get_post_type_archive_link($post->post_type) . '#' . $post->post_type . '-' . $post->ID);
-                die();
-            }
-        } /* redirect to index page */
-        elseif ($currentURL === get_site_url() . '/' . ($oes->theme_index['slug'] ?? 'index') . '/') {
-
-            global $oes_additional_objects, $oes_is_index, $oes_is_index_page;
-            if ($oes_additional_objects = $oes->theme_index['objects'] ?? false) {
-                $oes_is_index = true;
-                $oes_is_index_page = true;
-                if (locate_template('archive.php', true)) exit();
-            }
-
-        } elseif ($oes->taxonomies) {
-            foreach ($oes->taxonomies as $taxonomyKey => $singleTaxonomy) {
-
-                /* add action for taxonomy single pages */
-                if (has_action('oes/theme_redirect_taxonomy'))
-                    do_action('oes/theme_redirect_taxonomy', $taxonomyKey, $singleTaxonomy, $currentURL);
-
-                /* Archive pages */
-                if (isset($singleTaxonomy['rewrite']['slug']) &&
-                    $currentURL === get_site_url() . '/' . $singleTaxonomy['rewrite']['slug'] . '/' &&
-                    !is_page($singleTaxonomy['rewrite']['slug'])) {
-
-                    global $oes_additional_objects, $oes_is_index;
-                    if ($oes_additional_objects = [$taxonomyKey]) {
-                        $oes_is_index = true;
-                        if (locate_template('archive.php', true)) exit();
-                    }
-                }
-            }
-        }
-    }
+    register_sidebar([
+        'name' => 'Search Sidebar',
+        'id' => 'oes-search-sidebar']);
 }
 
 
-/* modify top navigation (add search) */
-add_action('wp_nav_menu_items', 'oes_theme_action_wp_nav_menu_items', 10, 2);
-
 /**
- * Add search to top navigation menu at end
+ * Prepare general theme labels.
  *
- * @param string $items The HTML list content for the menu items.
- * @param stdClass $menu n object containing wp_nav_menu() arguments.
- * @return string Return the modified HTML list content.
+ * @param array $themeLabels The theme labels.
+ * @return array Return the modified theme labels.
  */
-function oes_theme_action_wp_nav_menu_items(string $items, stdClass $menu): string
+function oes_theme_labels_oes_config(array $themeLabels): array
 {
-    if ($menu->theme_location == 'oes-header-menu') {
-        global $oes_language, $oes;
-        $consideredLanguage = $oes_language === 'all' ? 'language0' : $oes_language;
-        return $items .
-            oes_theme_add_search_to_navigation($oes->theme_labels['search__navigation__label'][$consideredLanguage] ?? 'SEARCH');
-    }
-    return $items;
+    return array_merge([
+        '404__header' => [
+            'language0' => 'Page not found',
+            'name' => '404 Page Not Found, Header',
+            'location' => 'Page not found, tab header'
+        ],
+        '404__search_text' => [
+            'language0' => 'Page not found',
+            'name' => '404 Page Not Found, Search Text',
+            'location' => 'Page not found, search text'
+        ],
+        '404_page_content' => [
+            'language0' => '',
+            'name' => '404 Page Not Found, Content',
+            'location' => 'Page not found, content'
+        ],
+        'no_results_found' => [
+            'language0' => 'No entries found for this filter combination.',
+            'name' => 'No entries found for filter combination.',
+            'location' => 'e.g. archive and search'
+        ],
+        'search__navigation__text' => [
+            'language0' => 'Search the OES Encyclopedia',
+            'name' => 'Search Panel, Text',
+            'location' => 'Search Panel, above the search field'
+        ],
+        'sidebar__archive_header__responsive_expand' => [
+            'language0' => 'Refine Search',
+            'name' => 'Sidebar archive header refine search for responsive',
+            'location' => 'Archive Sidebar'
+        ],
+        'search__no_results' => [
+            'language0' => 'No results.',
+            'name' => 'Search Results Page, No results',
+            'location' => 'Search results page, no results found'
+        ],
+        'search__result_table__header_occurrences' => [
+            'language0' => 'Occurrences',
+            'name' => 'Search Result table Header, Occurrences',
+            'location' => 'Search results, result table header'
+        ],
+        'search__see_term' => [
+            'language0' => 'See also: ',
+            'name' => 'Search Result Page, See also term',
+            'location' => 'Search results page'
+        ]
+    ], $themeLabels);
 }
 
 
 /**
- * Display the loading spinner
+ * Prepare theme labels for objects.
+ *
+ * @param array $themeLabels The theme labels.
+ * @param string $object Object key.
+ * @return array Return the modified theme labels.
  */
-function oes_theme_loading_spinner()
+function oes_theme_labels_object(array $themeLabels, string $object): array
 {
-    echo '<div class="oes-loading-spinner-wrapper">' .
-        '<div class="oes-loading-spinner-wrapper"></div>' .
-        '<div id="oes-loading-spinner">' .
-        '<div class="oes-loading-spinner-bar1"></div>' .
-        '<div class="oes-loading-spinner-bar2"></div>' .
-        '<div class="oes-loading-spinner-bar3"></div>' .
-        '<div class="oes-loading-spinner-bar4"></div>' .
-        '<div class="oes-loading-spinner-bar5"></div>' .
-        '</div>' .
-        '</div>';
+    global $oes;
+    $themeLabelsDefaults = [
+        'archive__header' => [
+            'name' => 'Archive: sub title',
+            'location' => 'Archive view, Header'
+        ]
+    ];
+
+    foreach ($themeLabelsDefaults as $themeLabelKey => $defaultInfo) {
+        foreach ($oes->languages as $languageKey => $languageData)
+            $themeLabelsDefaults[$themeLabelKey][$languageKey] = $object . ' (' . $defaultInfo['name'] . ')';
+    }
+
+    return array_merge($themeLabelsDefaults, $themeLabels);
 }
 
-
-/* fetch search result after page is loaded */
-add_action('wp_ajax_oes_fetch_search_result_data', 'oes_fetch_search_result_data');
-add_action('wp_ajax_nopriv_oes_fetch_search_result_data', 'oes_fetch_search_result_data');
 
 /**
  * Fetch search result data
@@ -228,3 +278,43 @@ function oes_fetch_search_result_data()
     die();
 }
 
+
+/**
+ * Display sidebar
+ *
+ * @param string $sidebar The sidebar id.
+ * @param array $args Additional arguments.
+ * @return void
+ */
+function oes_display_sidebar(string $sidebar, array $args = []): void
+{
+
+    $args = array_merge([
+        'class' => 'oes-sidebar-list'
+    ], $args);
+
+    if (is_active_sidebar($sidebar)):?>
+    <div class="<?php echo $args['class'] . '-wrapper'; ?>">
+        <ul class="<?php echo $args['class']; ?>"><?php
+            dynamic_sidebar($sidebar); ?></ul>
+        </div><?php
+    endif;
+}
+
+
+/**
+ * Display the loading spinner
+ * @return void
+ */
+function oes_theme_loading_spinner(): void
+{
+    echo '<div class="oes-loading-spinner-wrapper">' .
+        '<div id="oes-loading-spinner">' .
+        '<div class="oes-loading-spinner-bar1"></div>' .
+        '<div class="oes-loading-spinner-bar2"></div>' .
+        '<div class="oes-loading-spinner-bar3"></div>' .
+        '<div class="oes-loading-spinner-bar4"></div>' .
+        '<div class="oes-loading-spinner-bar5"></div>' .
+        '</div>' .
+        '</div>';
+}

@@ -1,5 +1,7 @@
-<div class="oes-subheader">
-    <div class="container">
-        <div class="text-center"><h3 class="oes-title-header"><?php the_title(); ?></h3></div>
+<div class="oes-subheader d-print-none">
+    <div class="oes-subheader-title-container">
+        <div class="<?php global $oes_container_class; echo $oes_container_class ?? ''; ?>">
+            <div class="oes-page-title"><?php the_title(); ?></div>
+        </div>
     </div>
 </div>
