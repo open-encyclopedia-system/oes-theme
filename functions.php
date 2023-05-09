@@ -107,7 +107,7 @@ function oes_theme_action_enqueue_scripts(): void
     wp_register_style('bootstrap', get_template_directory_uri() . '/assets/css/bootstrap.min.css');
     wp_enqueue_style('bootstrap');
 
-    wp_enqueue_style('oes-style', get_stylesheet_uri());
+    wp_enqueue_style('oes-style', get_template_directory_uri() . '/style.css');
 
     wp_register_style('oes-print', get_template_directory_uri() . '/assets/css/print.css');
     wp_enqueue_style('oes-print');
