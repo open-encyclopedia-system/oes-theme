@@ -1,0 +1,181 @@
+/* toggler */
+.navbar-toggler {
+    border: none !important;
+    padding-right: 0;
+}
+
+.navbar-toggler:focus {
+    outline: none;
+}
+
+@media (max-width: 992px) {
+
+
+    /* -----------------------------------------------------------------------------------------------------------------
+    -- GENERAL ---------------------------------------------------------------------------------------------------------
+    ------------------------------------------------------------------------------------------------------------------*/
+
+    html {
+        font-size: 16px;
+    }
+
+    .oes-body-wrapper {
+        padding-top: 61px !important;
+    }
+
+
+    /* -----------------------------------------------------------------------------------------------------------------
+    -- NAVIGATION ------------------------------------------------------------------------------------------------------
+    ------------------------------------------------------------------------------------------------------------------*/
+
+
+    header nav {
+        padding: 0 1rem;
+    }
+
+    img.oes-home-img {
+        height: 50px;
+        max-height: 50px;
+    }
+
+    #oes-utility-nav {
+        display: none;
+    }
+
+    #oes-main-nav {
+        font-size: .8rem;
+    }
+
+    header #oes-main-nav li {
+        padding: 0.5rem 1.5rem;
+    }
+
+    header #oes-utility-nav {
+        display: block !important;
+    }
+
+    header #oes-main-nav li {
+        padding-left: 0 !important;
+        font-family: Noto, sans-serif;
+    }
+
+    header #oes-top-menus {
+        flex-direction: row-reverse;
+    }
+
+    header #oes-top-menus ul {
+        padding:0;
+    }
+
+    header #oes-top-menus ul li {
+        padding-left:0;
+        display: block;
+        width: 100%;
+        border-bottom: 1px solid var(--oes-background);
+        font-size: 1rem;
+        text-transform: none;
+    }
+
+    header #oes-top-menus ul li a {
+        width: 100%;
+    }
+
+    header #oes-top-menus  .menu-item-object-oes-menu-item-search  {
+        display:none;
+    }
+
+    header #oes-top-menus ul .menu-item-has-children {
+        position: relative;
+    }
+
+    header #oes-top-menus ul .oes-nav-responsive-submenu:after {
+        color: var(--oes-dark);
+        position: absolute;
+        top:.5rem;
+        right:.5rem;
+        content: "";
+        display: block;
+        height: 1rem;
+        width: 1rem;
+        background-color: var(--oes-dark);
+        -webkit-mask-image: url("../icons/arrow-drop-down-svgrepo-com.svg");
+        mask-image: url("../icons/arrow-drop-down-svgrepo-com.svg");
+        background-size: 100%;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    header ul.oes-nav li.menu-item-has-children ul.sub-menu {
+        display: none !important;
+    }
+
+    header ul.oes-nav li.menu-item-has-children ul.sub-menu.active {
+        display: block !important;
+        position: relative;
+        border:none;
+    }
+
+    header #oes-top-menus ul.oes-nav li.menu-item-has-children ul.sub-menu li {
+        border-bottom: none;
+    }
+
+    header #oes-top-menus ul.oes-nav li.menu-item-has-children ul.sub-menu li a {
+        padding-left: 1rem;
+    }
+
+
+    /* -----------------------------------------------------------------------------------------------------------------
+    -- SIDEBAR ---------------------------------------------------------------------------------------------------------
+    ------------------------------------------------------------------------------------------------------------------*/
+
+    .oes-sidebar {
+        order: -1;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+
+    .single .oes-sidebar {
+        order: 1;
+    }
+
+    .oes-sidebar-list-wrapper {
+        padding: 0;
+        position: initial;
+    }
+
+    .oes-sidebar-toggle {
+        display: block;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--oes-dark);
+    }
+
+    .oes-sidebar-toggle a {
+        color: var(--oes-dark);
+    }
+
+    .oes-sidebar-toggle a:after {
+        background-color: var(--oes-dark);
+    }
+
+    .oes-sidebar-navigation {
+        display: none !important;
+    }
+
+
+    /* -----------------------------------------------------------------------------------------------------------------
+    -- PAGE ------------------------------------------------------------------------------------------------------------
+    ------------------------------------------------------------------------------------------------------------------*/
+
+    .oes-main-content {
+        border-right: none;
+        padding-right: 0;
+    }
+
+    .oes-archive-container .row.pr-3 {
+        padding-right: 0 !important;
+    }
+
+    .single .oes-subheader-title-container.oes-default .oes-page-title {
+        margin: 0 !important;
+    }
+}

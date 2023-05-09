@@ -1,0 +1,22 @@
+
+/* smaller header on scrolling */
+.oes-scrolled header nav {
+    padding: 0 1rem;
+}
+
+.oes-scrolled header img.oes-home-img {
+    height: 50px;
+    max-height: 50px;
+}
+
+.oes-scrolled header #oes-utility-nav {
+    display: none;
+}
+
+.oes-scrolled header #oes-main-nav {
+    font-size: .8rem;
+}
+
+.oes-scrolled header #oes-main-nav li {
+    padding: 0.5rem 1.5rem;
+}

@@ -38,8 +38,9 @@ if (!$oes_archive_displayed):
                 if (isset($row['id']) && !in_array($row['id'], $oes_archive_skipped_posts)) {
 
                     /* check if title is link */
-                    $title = (($oes_archive_data['archive']['display_content'] ?? false) ||
-                        (!$oes_archive_data['archive']['title_is_link'] ?? false)) ?
+                    $title = (isset($oes_archive_data['archive']) &&
+                        (($oes_archive_data['archive']['display_content'] ?? false) ||
+                        (!$oes_archive_data['archive']['title_is_link'] ?? false))) ?
                         sprintf('<span class="oes-archive-title" id="%s">%s</span>',
                             $post_type . '-' . $row['id'],
                             $row['title']
