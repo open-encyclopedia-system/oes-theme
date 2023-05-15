@@ -10,7 +10,7 @@ $oes_is_search = true;
 <div class="oes-background-white-slim">
     <div class="oes-archive-container container">
         <div class="row gx-5">
-            <div class="oes-title-header-wrapper oes-archive-container-list oes-main-content col-12 col-lg-8 mt-5"><?php
+            <div class="oes-title-header-wrapper oes-archive-container-list oes-main-content col-12 col-lg-8 oes-mt-3"><?php
 
                 get_template_part('template-parts/search', 'list-before');
 
@@ -20,7 +20,7 @@ $oes_is_search = true;
 
                 ?>
             </div>
-            <div class="oes-sidebar-with-toggle oes-sidebar col-12 col-lg-4 mt-5"><?php
+            <div class="oes-sidebar-with-toggle oes-sidebar col-12 col-lg-4 oes-mt-3"><?php
 
                 get_template_part('template-parts/search', 'sidebar');
 

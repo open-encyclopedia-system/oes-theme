@@ -181,6 +181,11 @@ a.oes-disabled-link {
     background-color: var(--oes-contrast);
 }
 
+.oes-mt-3 {
+    margin-top: 3rem;
+}
+
+
 /* ---------------------------------------------------------------------------------------------------------------------
 -- SPINNER -------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------*/
@@ -489,8 +494,6 @@ a.oes-result-navigation-next.disabled::after {
 .oes-panel-container .oes-toggle-down-after:after {
     vertical-align: middle;
     content: "";
-    height: 2rem;
-    width: 2rem;
     background-color: var(--oes-primary);
     -webkit-mask-image: url("assets/icons/arrow-drop-down-svgrepo-com.svg");
     mask-image: url("assets/icons/arrow-drop-down-svgrepo-com.svg");

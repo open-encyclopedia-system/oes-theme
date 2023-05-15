@@ -21,13 +21,13 @@ get_header(null, ['head-text' => $oes_post ? $oes_post->get_tab_title() : get_th
                 if (method_exists($oes_post, 'display_sidebar') ||
                     is_active_sidebar('oes-single-sidebar')) :?>
                     <div class="row gx-5">
-                        <div class="oes-main-content col-12 col-lg-8 mt-5"><?php
+                        <div class="oes-main-content col-12 col-lg-8 oes-mt-3"><?php
 
                             the_content();
 
                             ?>
                         </div>
-                        <div class="oes-sidebar col-12 col-lg-4 mt-5"><?php
+                        <div class="oes-sidebar col-12 col-lg-4 oes-mt-3"><?php
 
                             if (method_exists($oes_post, 'display_sidebar')) :
                                 $oes_post->display_sidebar();

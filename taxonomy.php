@@ -20,10 +20,10 @@ get_header(null, ['head-text' => $oes_term->title]);
                 /* display with sidebar */
                 if (method_exists($oes_term, 'display_sidebar')) :?>
                     <div class="row gx-5">
-                        <div class="oes-main-content col-12 col-lg-8 mt-5"><?php
+                        <div class="oes-main-content col-12 col-lg-8 oes-mt-3"><?php
                             echo $oes_term->get_html_main(['language' => $oes_language]); ?>
                         </div>
-                        <div class="oes-sidebar col-12 col-lg-4 mt-5"><?php
+                        <div class="oes-sidebar col-12 col-lg-4 oes-mt-3"><?php
                             $oes_term->display_sidebar(); ?>
                         </div>
                     </div>

@@ -8,7 +8,7 @@
             <div class="<?php global $oes_is_index;
             echo $oes_is_index ? 'oes-archive-container-index ' : ''; ?>oes-archive-container container">
                 <div class="row gx-5">
-                    <div class="oes-title-header-wrapper oes-archive-container-list oes-main-content col-12 col-lg-8 mt-5"><?php
+                    <div class="oes-title-header-wrapper oes-archive-container-list oes-main-content col-12 col-lg-8 oes-mt-3"><?php
 
                         get_template_part('template-parts/archive', 'list-before');
 
@@ -18,7 +18,7 @@
 
                         ?>
                     </div>
-                    <div class="oes-sidebar-with-toggle oes-sidebar col-12 col-lg-4 mt-5"><?php
+                    <div class="oes-sidebar-with-toggle oes-sidebar col-12 col-lg-4 oes-mt-3"><?php
 
                         get_template_part('template-parts/archive', 'sidebar');
 
