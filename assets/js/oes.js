@@ -114,16 +114,13 @@ if (jQuery(window).width() < 992) {
     /* add search input to navigation */
     const search_input_el = jQuery('#s');
     if (search_input_el.length < 2) {
-        const getUrl = window.location;
-        const baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
-
         const urlSearchParams = new URLSearchParams(window.location.search),
             params = Object.fromEntries(urlSearchParams.entries());
         let search_term = '';
         if ('s' in params) search_term = params['s'];
 
         jQuery('<li class="oes-search-form-responsive-li menu-item">' +
-            '<form action="' + baseUrl + '" method="get" id="oes-search-form">' +
+            '<form action="' + window.location.origin + '/" method="get" id="oes-search-form">' +
             '<label for="s"></label>' +
             '<input type="text" name="s" id="s" value="' + search_term + '" required>' +
             '<button type="submit"></button>' +

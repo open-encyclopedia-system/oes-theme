@@ -50,7 +50,7 @@ else:?><div class="oes-search-archive-container"><?php
                             if (isset($dataRow['td'][$position])) {
                                 if ($rowKey === 'content')
                                     $resultsTable .= '<tr><td colspan="2">' . $dataRow['td'][$position] . '</td></tr>';
-                                else $resultTable = '<tr>' .
+                                else $resultsTable .= '<tr>' .
                                     '<th>' . $singleOccurrence . '</th>' .
                                     '<td>' . $dataRow['td'][$position] . '</td></tr>';
                             }

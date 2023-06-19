@@ -6,7 +6,7 @@
 
                 global $oes_nav_language;
                 if (isset($args['search-text']) && $args['search-text']) echo $args['search-text'];
-                else echo($oes->theme_labels['search__navigation__text'][$oes_nav_language] ??
+                else echo(OES()->theme_labels['search__navigation__text'][$oes_nav_language] ??
                     __('Search the OES Encyclopedia', 'oes'));
 
                 ?>
