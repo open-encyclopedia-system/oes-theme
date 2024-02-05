@@ -4,10 +4,8 @@
         <div class="oes-search-panel-form container text-center">
             <h1><?php
 
-                global $oes_nav_language;
                 if (isset($args['search-text']) && $args['search-text']) echo $args['search-text'];
-                else echo(OES()->theme_labels['search__navigation__text'][$oes_nav_language] ??
-                    __('Search the OES Encyclopedia', 'oes'));
+                else echo oes_get_label('search__navigation__text', 'Search the OES Encyclopedia');
 
                 ?>
             </h1>

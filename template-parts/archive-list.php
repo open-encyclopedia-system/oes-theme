@@ -5,18 +5,17 @@ global $oes_archive_displayed;
 $oes_archive_displayed = false;
 
 /* call hook or get template (return $oes_archive_displayed) */
-if (has_action('oes/theme_archive_list'))
-    do_action('oes/theme_archive_list');
+do_action('oes/theme_archive_list');
 
 if (!$oes_archive_displayed):
 
-    global $post_type, $oes, $oes_archive_data, $oes_archive_alphabet_initial, $oes_archive_skipped_posts, $oes_language;
+    global $post_type, $oes_archive_data, $oes_archive_alphabet_initial, $oes_archive_skipped_posts, $oes_language;
     if (!$oes_archive_skipped_posts) $oes_archive_skipped_posts = [];
 
     /* display empty results */
     $tableArray = $oes_archive_data['table-array'] ?? [];
     if (empty($tableArray) || count($tableArray) == 0) :
-        echo $oes->theme_labels['search__no_results'][$oes_language] ?? 'No results.';
+        echo oes_get_label('no_results_found', 'No results.');
 
     /* loop through table data -------------------------------------------------------------------------------------------*/
     else:

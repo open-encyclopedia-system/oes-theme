@@ -6,7 +6,7 @@ if ($archive):?>
     <div class="oes-subheader d-print-none">
     <div class="oes-subheader-title-container">
         <div class="container">
-            <div class="oes-archive-header oes-page-title"><?php echo $archive['label']; ?></div>
+            <div class="oes-archive-header oes-page-title print-black"><?php echo $archive['label']; ?></div>
         </div>
     </div>
     </div><?php

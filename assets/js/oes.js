@@ -51,7 +51,7 @@ jQuery(document).ready(function () {
 
 
     /* Archive: check for pre-filter from url after loading page -----------------------------------------------------*/
-    oesPreFilterArchive();
+    oesFilter.filterFromURL();
 
 
     /* Resize columns ------------------------------------------------------------------------------------------------*/

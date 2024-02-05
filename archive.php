@@ -3,14 +3,11 @@
 global $oes_archive_data;
 
 /* display header ----------------------------------------------------------------------------------------------------*/
-get_header(null, ['head-text' => strip_tags($oes_archive_data['archive']['label'] ?? '')]);
+get_header(null, ['head-text' => strip_tags($oes_archive_data['archive']['page_title'] ?? '')]);
 
 
 /* display main content ----------------------------------------------------------------------------------------------*/
 ?>
-    <script type="text/javascript">
-        let oes_filter = <?php echo json_encode($oes_archive_data['archive']['filter_array']['json'] ?? []);?>;
-    </script>
     <main class="oes-smooth-loading"><?php
 
         get_template_part('template-parts/archive', 'content');

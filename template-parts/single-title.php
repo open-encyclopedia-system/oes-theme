@@ -2,11 +2,7 @@
 global $oes, $oes_post, $oes_language, $oes_container_class;
 
 /* Prepare archive link */
-if ($oes_language != $oes->main_language)
-    $archiveLink = get_site_url() . '/' . strtolower($oes->languages[$oes_language]['abb']) . '/' .
-        (get_post_type_object($oes_post->post_type)->rewrite['slug'] ?? $oes_post->post_type) . '/';
-else
-    $archiveLink = get_post_type_archive_link($oes_post->post_type);
+$archiveLink = get_post_type_archive_link($oes_post->post_type);
 
 $archiveLinkText = sprintf('<a href="%s">%s</a>',
     $archiveLink,
@@ -33,7 +29,7 @@ $archiveLinkText = sprintf('<a href="%s">%s</a>',
     </div>
     <div class="oes-subheader-title-container oes-default">
         <div class="<?php echo $oes_container_class ?? ''; ?>">
-            <div class="oes-page-title"><?php echo $archiveLinkText;?></div>
+            <div class="oes-page-title print-black"><?php echo $archiveLinkText;?></div>
         </div>
     </div><?php
 

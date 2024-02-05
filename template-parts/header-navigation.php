@@ -1,11 +1,11 @@
 <?php
 
-global $oes, $oes_nav_language;
+global $oes, $oes_language;
 
 $homeURL = '';
-if ($oes_nav_language != $oes->main_language)
-    $homeURL = strtolower($oes->languages[$oes_nav_language]['abb'] ?? '');
-if (empty($oes_nav_language)) $oes_nav_language = 'language0';
+if ($oes_language != 'language0')
+    $homeURL = strtolower($oes->languages[$oes_language]['abb'] ?? '');
+if (empty($oes_language)) $oes_language = 'language0';
 
 $homeLogo = get_option('oes_theme-header_logo');
 $homeLogoSrc = (!empty($homeLogo) ?
@@ -34,9 +34,9 @@ $homeLogoPrintSrc = (!empty($homeLogoPrint) ?
         <div class="oes-top-menu-container">
             <div id="oes-utility-nav"><?php
 
-                if (has_nav_menu('oes-utility-menu-' . $oes_nav_language))
+                if (has_nav_menu('oes-utility-menu-' . $oes_language))
                     wp_nav_menu([
-                        'theme_location' => 'oes-utility-menu-' . $oes_nav_language,
+                        'theme_location' => 'oes-utility-menu-' . $oes_language,
                         'menu_class' => 'oes-nav navbar-nav ml-auto mt-lg-0'
                     ]);
 
@@ -44,9 +44,9 @@ $homeLogoPrintSrc = (!empty($homeLogoPrint) ?
             </div>
             <div id="oes-main-nav"><?php
 
-                if (has_nav_menu('oes-header-menu-' . $oes_nav_language))
+                if (has_nav_menu('oes-header-menu-' . $oes_language))
                     wp_nav_menu([
-                        'theme_location' => 'oes-header-menu-' . $oes_nav_language,
+                        'theme_location' => 'oes-header-menu-' . $oes_language,
                         'menu_class' => 'oes-nav navbar-nav ml-auto mt-lg-0'
                     ]);
 

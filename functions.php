@@ -1,37 +1,39 @@
 <?php
 
 /* activate theme features */
-add_action('after_setup_theme', 'oes_theme_action_after_setup_theme');
-add_filter('init', 'oes_theme_set_language_cookie', 999);
-add_action('wp_enqueue_scripts', 'oes_theme_action_enqueue_scripts');
-add_action('widgets_init', 'oes_widget_init');
+add_action('after_setup_theme', 'oes_theme__after_setup_theme');
+add_action('wp_enqueue_scripts', 'oes_theme__action_enqueue_scripts');
+add_action('widgets_init', 'oes_theme__widget_init');
 
 /* prepare theme labels */
-add_filter('oes/prepare_theme_labels_oes_config', 'oes_theme_labels_oes_config');
-add_filter('oes/prepare_theme_labels_taxonomy', 'oes_theme_labels_object', 10, 2);
-add_filter('oes/prepare_theme_labels_post', 'oes_theme_labels_object', 10, 2);
+add_filter('oes/prepare_theme_labels_oes_config', 'oes_theme__labels_oes_config');
+add_filter('oes/prepare_theme_labels_taxonomy', 'oes_theme__labels_object', 10, 2);
+add_filter('oes/prepare_theme_labels_post', 'oes_theme__labels_object', 10, 2);
 
 /* fetch search result after page is loaded */
-add_action('wp_ajax_oes_fetch_search_result_data', 'oes_fetch_search_result_data');
-add_action('wp_ajax_nopriv_oes_fetch_search_result_data', 'oes_fetch_search_result_data');
+add_action('wp_ajax_oes_theme__fetch_search_result_data', 'oes_theme__fetch_search_result_data');
+add_action('wp_ajax_nopriv_oes_theme__fetch_search_result_data', 'oes_theme__fetch_search_result_data');
+
+/* redirect theme */
+add_action('oes/redirect_template', 'oes_theme__redirect_template');
 
 
 /**
  * Set up the OES theme.
  * @return void
  */
-function oes_theme_action_after_setup_theme(): void
+function oes_theme__after_setup_theme(): void
 {
 
-    /* Widgets */
+    /* enable widgets */
     add_theme_support('widgets');
 
 
-    /* Enable styling for editor (block css) */
+    /* enable styling for editor (block css) */
     add_theme_support('editor-styles');
 
 
-    /* Register menus */
+    /* register menus */
     $menus = [];
 
     /* prepare menu locations for all languages */
@@ -63,37 +65,24 @@ function oes_theme_action_after_setup_theme(): void
      *
      * @param array $menus The menus.
      */
-    if (has_filter('oes/theme_menus'))
-        $menus = apply_filters('oes/theme_menus', $menus);
+    $menus = apply_filters('oes/theme_menus', $menus);
+
 
     register_nav_menus($menus);
 
 
-    /* Add fav icon for pages */
+    /* add fav icon for pages */
     if (function_exists('oes_theme_add_favicon'))
         oes_theme_add_favicon(get_template_directory_uri() . '/assets/images/favicon.ico');
 
 
-    /* Modify the WordPress search to use OES Feature "Search" */
+    /* modify the WordPress search to use OES feature "Search" */
     if (function_exists('oes_theme_modify_search')) oes_theme_modify_search();
-}
 
-
-/**
- * Set up language cookie.
- * @return void
- */
-function oes_theme_set_language_cookie(): void
-{
-    if (isset($_GET['oes-language-switch']) || !isset($_COOKIE['oes_language'])) {
-        global $oes;
-        $newValue = $_GET['oes-language-switch'] ?? 'language0';
-        if (isset($oes->languages[$newValue]))
-            if (setcookie('oes_language', $newValue, time() + (30 * DAY_IN_SECONDS), '/')) {
-                global $oes_language_switched;
-                $oes_language_switched = $newValue;
-            }
-    }
+    /* set global parameters */
+    global $oes_archive_alphabet_initial, $oes_container_class;
+    $oes_archive_alphabet_initial = true;
+    $oes_container_class = 'container';
 }
 
 
@@ -101,7 +90,7 @@ function oes_theme_set_language_cookie(): void
  * Load styles and scripts.
  * @return void
  */
-function oes_theme_action_enqueue_scripts(): void
+function oes_theme__action_enqueue_scripts(): void
 {
     /* enqueue styles */
     wp_register_style('bootstrap', get_template_directory_uri() . '/assets/css/bootstrap.min.css');
@@ -169,7 +158,7 @@ function oes_theme_action_enqueue_scripts(): void
  * Register sidebars
  * @return void
  */
-function oes_widget_init(): void
+function oes_theme__widget_init(): void
 {
     register_sidebar([
         'name' => 'Archive Sidebar',
@@ -191,53 +180,146 @@ function oes_widget_init(): void
  * @param array $themeLabels The theme labels.
  * @return array Return the modified theme labels.
  */
-function oes_theme_labels_oes_config(array $themeLabels): array
+function oes_theme__labels_oes_config(array $themeLabels): array
 {
     return array_merge([
         '404__header' => [
             'language0' => 'Page not found',
             'name' => '404 Page Not Found, Header',
-            'location' => 'Page not found, tab header'
+            'location' => 'Page not found, tab header',
+            'classic' => 2.3
         ],
         '404__search_text' => [
             'language0' => 'Page not found',
             'name' => '404 Page Not Found, Search Text',
-            'location' => 'Page not found, search text'
+            'location' => 'Page not found, search text',
+            'classic' => 2.3
         ],
         '404_page_content' => [
             'language0' => '',
             'name' => '404 Page Not Found, Content',
-            'location' => 'Page not found, content'
+            'location' => 'Page not found, content',
+            'classic' => 2.3
+        ],
+        'sidebar__archive_header__refine_search' => [
+            'language0' => 'Refine search',
+            'name' => 'Archive sidebar header label',
+            'location' => 'archive sidebar',
+            'classic' => 2.3
         ],
         'no_results_found' => [
             'language0' => 'No entries found for this filter combination.',
             'name' => 'No entries found for filter combination.',
-            'location' => 'e.g. archive and search'
+            'location' => 'e.g. archive and search',
+            'classic' => 2.3
         ],
         'search__navigation__text' => [
             'language0' => 'Search the OES Encyclopedia',
             'name' => 'Search Panel, Text',
-            'location' => 'Search Panel, above the search field'
+            'location' => 'Search Panel, above the search field',
+            'classic' => 2.3
         ],
         'sidebar__archive_header__responsive_expand' => [
             'language0' => 'Refine Search',
             'name' => 'Sidebar archive header refine search for responsive',
-            'location' => 'Archive Sidebar'
+            'location' => 'Archive Sidebar',
+            'classic' => 2.3
         ],
         'search__no_results' => [
             'language0' => 'No results.',
             'name' => 'Search Results Page, No results',
-            'location' => 'Search results page, no results found'
+            'location' => 'Search results page, no results found',
+            'classic' => 2.3
         ],
         'search__result_table__header_occurrences' => [
             'language0' => 'Occurrences',
             'name' => 'Search Result table Header, Occurrences',
-            'location' => 'Search results, result table header'
+            'location' => 'Search results, result table header',
+            'classic' => 2.3
         ],
         'search__see_term' => [
             'language0' => 'See also: ',
             'name' => 'Search Result Page, See also term',
-            'location' => 'Search results page'
+            'location' => 'Search results page',
+            'classic' => 2.3
+        ],
+        'search__result__count_singular' => [
+            'language0' => 'Result',
+            'name' => 'Search Result Page, Entries Count Label (Singular)',
+            'location' => 'Search results page',
+            'classic' => 2.3
+        ],
+        'search__result__count_plural' => [
+            'language0' => 'Results',
+            'name' => 'Search Result Page, Entries Count Label (Plural)',
+            'location' => 'Search results page',
+            'classic' => 2.3
+        ],
+        'archive__entry' => [
+            'language0' => 'Entry',
+            'name' => 'Archive Result Page, Entries Count Label (Singular)',
+            'location' => 'Archive page',
+            'classic' => 2.3
+        ],
+        'archive__entries' => [
+            'language0' => 'Entries',
+            'name' => 'Archive Result Page, Entries Count Label (Plural)',
+            'location' => 'Archive page',
+            'classic' => 2.3
+        ],
+        'single__sub_line__author_by' => [
+            'name' => 'Sub line, author by label',
+            'location' => 'Single view, subline',
+            'language0' => 'by',
+            'classic' => 2.3
+        ],
+        'single__sub_line__translation' => [
+            'name' => 'Sub line, other language version available',
+            'location' => 'Single view, subline',
+            'language0' => 'Different language version available: ',
+            'classic' => 2.3
+        ],
+        'single__toc__header_toc' => [
+            'name' => 'Header: Table of Contents',
+            'location' => 'Single view, table of contents header',
+            'language0' => 'Table of Contents',
+            'classic' => 2.3
+        ],
+        'single__toc__header_citation' => [
+            'name' => 'Header: Citation',
+            'location' => 'Single view, citation header',
+            'language0' => 'Citation',
+            'classic' => 2.3
+        ],
+        'single__toc__header_notes' => [
+            'name' => 'Header: Notes',
+            'location' => 'Single view, notes header',
+            'language0' => 'Notes',
+            'classic' => 2.3
+        ],
+        'single__toc__header_metadata' => [
+            'name' => 'Header: Metadata',
+            'location' => 'Single view, metadata header',
+            'language0' => 'Metadata',
+            'classic' => 2.3
+        ],
+        'single__toc__index' => [
+            'language0' => 'Referred to in',
+            'name' => 'Single (Index header)',
+            'location' => 'Single view, related objects',
+            'classic' => 2.3
+        ],
+        'single__toc__index_language_header' => [
+            'language0' => 'Articles in other languages:',
+            'name' => 'Single (Index header, language differentiation)',
+            'location' => 'Single view, related objects',
+            'classic' => 2.3
+        ],
+        'single__toc__index_contributor' => [
+            'language0' => 'Published Articles',
+            'name' => 'Single (Index header, Contributor)',
+            'location' => 'Single view, related objects for contributor type',
+            'classic' => 2.3
         ]
     ], $themeLabels);
 }
@@ -250,7 +332,7 @@ function oes_theme_labels_oes_config(array $themeLabels): array
  * @param string $object Object key.
  * @return array Return the modified theme labels.
  */
-function oes_theme_labels_object(array $themeLabels, string $object): array
+function oes_theme__labels_object(array $themeLabels, string $object): array
 {
     global $oes;
     $themeLabelsDefaults = [
@@ -272,7 +354,7 @@ function oes_theme_labels_object(array $themeLabels, string $object): array
 /**
  * Fetch search result data
  */
-function oes_fetch_search_result_data()
+function oes_theme__fetch_search_result_data(): void
 {
     get_template_part('template-parts/search', 'content');
     die();
@@ -288,14 +370,10 @@ function oes_fetch_search_result_data()
  */
 function oes_display_sidebar(string $sidebar, array $args = []): void
 {
-
-    $args = array_merge([
-        'class' => 'oes-sidebar-list'
-    ], $args);
-
+    $class = $args['class'] ?? 'oes-sidebar-list';
     if (is_active_sidebar($sidebar)):?>
-    <div class="<?php echo $args['class'] . '-wrapper'; ?>">
-        <ul class="<?php echo $args['class']; ?>"><?php
+    <div class="<?php echo $class . '-wrapper'; ?>">
+        <ul class="<?php echo $class; ?>"><?php
             dynamic_sidebar($sidebar); ?></ul>
         </div><?php
     endif;
@@ -306,7 +384,7 @@ function oes_display_sidebar(string $sidebar, array $args = []): void
  * Display the loading spinner
  * @return void
  */
-function oes_theme_loading_spinner(): void
+function oes_theme__loading_spinner(): void
 {
     echo '<div class="oes-loading-spinner-wrapper">' .
         '<div id="oes-loading-spinner">' .
@@ -317,4 +395,106 @@ function oes_theme_loading_spinner(): void
         '<div class="oes-loading-spinner-bar5"></div>' .
         '</div>' .
         '</div>';
+}
+
+
+/**
+ * Redirect template.
+ *
+ * @return void
+ */
+function oes_theme__redirect_template(): void
+{
+    if (locate_template('archive.php', true)) exit();
+}
+
+
+/**
+ * Display search results per language.
+ * 
+ * @param array $results The results.
+ * @return void
+ */
+function oes_theme__display_search_results(array $results): void
+{
+    /* sort results by occurrences */
+    krsort($results);
+    foreach ($results as $type => $posts) :
+
+        /* loop through entries */
+        ksort($posts);
+        $containerString = '';
+        $displayType = true;
+        foreach ($posts as $rowData)
+            foreach ($rowData as $row) {
+
+                /* display type for first element */
+                if ($displayType):
+                    echo '<div class="oes-search-archive-container oes-archive-wrapper oes-post-type-filter oes-post-type-filter-' . $type .
+                        '" data-alphabet="' . $type . '">' .
+                        '<div class="oes-alphabet-initial">' . ($row['type'] ?? $type) . '</div>';
+                    $displayType = false;
+                endif;
+
+                /* prepare title */
+                $title = sprintf('<a href="%s" class="oes-archive-title">%s</a>',
+                    $row['permalink'],
+                    $row['occurrences']['title']['td'][0] ?? ($row['title'] ?: 'Title missing')
+                );
+
+                /* add version */
+                $additionalInfo = [];
+                if (!empty($row['version'])) $additionalInfo[] = __('Version ', 'oes') . $row['version'];
+
+                /* add occurrences */
+                $additionalInfo[] = $row['occurrences-count'] . ' ' .
+                    oes_get_label('search__result_table__header_occurrences', 'Occurrences');
+
+                $title .= '<span class="oes-search-result-version-info">(' .
+                    implode(' | ', $additionalInfo) .
+                    ')</span>';
+
+                /* check for results */
+                $resultsTable = false;
+                foreach ($row['occurrences'] ?? [] as $dataRow)
+                    if (isset($dataRow['value']) &&
+                        (!empty($dataRow['value']) &&
+                            (is_string($dataRow['value']) && strlen(trim($dataRow['value'])) != 0))) {
+                        if (!empty($dataRow['label'] ?? ''))
+                            $resultsTable .= sprintf('<tr><th>%s</th><td>%s</td></tr>',
+                                $dataRow['label'],
+                                $dataRow['value']);
+                        else
+                            $resultsTable .= '<tr><td colspan="2">' . $dataRow['value'] . '</td></tr>';
+                    }
+
+                /* display row with results */
+                if ($resultsTable)
+                    $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-%s oes-post-filter-%s">' .
+                        '<a href="#row%s" data-toggle="collapse" aria-expanded="false" class="oes-archive-plus oes-toggle-down-before"></a>' .
+                        '%s<div class="oes-archive-table-wrapper collapse" id="row%s">' .
+                        '<table class="oes-archive-table oes-simple-table">%s' .
+                        '</table>' .
+                        '</div></div>',
+                        ($row['language'] ?: 'all'),
+                        $row['id'],
+                        $row['id'],
+                        $title . (is_string($row['additional']) ? $row['additional'] : ''),
+                        $row['id'],
+                        $resultsTable);
+                else
+                    $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-%s oes-post-filter-%s">%s</div>',
+                        ($row['language'] ?: 'all'),
+                        $row['id'],
+                        $title . (empty($row['additional']) || !is_string($row['additional']) ? '' : $row['additional'])
+                    );
+            }
+
+        if (!empty($containerString))
+            printf('<div class="oes-search-archive-wrapper oes-archive-wrapper oes-post-type-filter oes-post-type-filter-%s">%s</div>',
+                $type,
+                $containerString);
+
+        echo '</div>';
+    endforeach;
 }

@@ -7,7 +7,7 @@ if($oes_search) $searchTerm = (is_array($oes_search) && isset($oes_search['searc
 
     /* check for other languages */
     global $oes, $oes_language;
-    if ($oes_language && $oes_language !== $oes->main_language): ?>
+    if ($oes_language && $oes_language !== 'language0'): ?>
         <label for="oes-language-hidden-input"></label>
         <input type="text" name="oes-language-switch" id="oes-language-hidden-input" value="<?php echo $oes_language; ?>"
                required hidden><?php

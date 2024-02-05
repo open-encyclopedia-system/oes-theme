@@ -5,7 +5,7 @@ global $taxonomy, $oes, $oes_term, $oes_container_class, $oes_language;
 $archiveLink = $taxonomy;
 if ($taxonomyObject = get_taxonomy($taxonomy))
     $archiveLink = sprintf('<a href="%s">%s</a>',
-        (get_site_url() . '/' . $oes->taxonomies[$taxonomy]['rewrite']['slug'] . '/'),
+        (get_site_url() . '/' . $taxonomyObject->rewrite['slug'] . '/'),
         ($oes->taxonomies[$taxonomy]['label_translations'][$oes_language] ??
             ($oes->taxonomies[$taxonomy]['label_translations'][$oes_language] ??
             ($oes->taxonomies[$taxonomy]['label'] ?: $taxonomyObject->label)))
@@ -16,7 +16,7 @@ if ($taxonomyObject = get_taxonomy($taxonomy))
 <div class="oes-subheader d-print-none">
         <div class="oes-subheader-title-container">
         <div class="<?php echo $oes_container_class ?? ''; ?>">
-            <div class="oes-page-title"><?php echo $archiveLink;?></div>
+            <div class="oes-page-title print-black"><?php echo $archiveLink;?></div>
         </div>
     </div><?php
 

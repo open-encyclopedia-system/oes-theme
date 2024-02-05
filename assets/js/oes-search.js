@@ -6,7 +6,11 @@ jQuery(document).ready(function () {
         jQuery.ajax({
             type: "POST",
             url: oesSearchAJAX.ajax_url,
-            data: {action: 'oes_fetch_search_result_data', nonce: oesSearchAJAX.ajax_nonce, search_params: oes_search_results},
+            data: {
+                action: 'oes_theme__fetch_search_result_data',
+                nonce: oesSearchAJAX.ajax_nonce,
+                search_params: oes_search_results
+            },
             success: function (data) {
                 jQuery('#oes-search-results').html(data).fadeIn();
                 jQuery('.oes-loading-spinner-wrapper').fadeOut();
