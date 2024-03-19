@@ -14,6 +14,7 @@ jQuery(document).ready(function () {
             success: function (data) {
                 jQuery('#oes-search-results').html(data).fadeIn();
                 jQuery('.oes-loading-spinner-wrapper').fadeOut();
+                oesFilter.updateCount();
             }
         });
     }

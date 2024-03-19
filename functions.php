@@ -439,7 +439,7 @@ function oes_theme__display_search_results(array $results): void
                 /* prepare title */
                 $title = sprintf('<a href="%s" class="oes-archive-title">%s</a>',
                     $row['permalink'],
-                    $row['occurrences']['title']['td'][0] ?? ($row['title'] ?: 'Title missing')
+                    $row['occurrences']['title']['value'] ?? ($row['title'] ?: 'Title missing')
                 );
 
                 /* add version */
