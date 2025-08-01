@@ -422,10 +422,11 @@ function oes_theme__display_search_results(array $results): void
     foreach ($results as $type => $posts) :
 
         /* loop through entries */
-        ksort($posts);
+        krsort($posts);
         $containerString = '';
         $displayType = true;
-        foreach ($posts as $rowData)
+        foreach ($posts as $rowData) {
+            ksort($rowData);
             foreach ($rowData as $row) {
 
                 /* display type for first element */
@@ -465,7 +466,8 @@ function oes_theme__display_search_results(array $results): void
                                 $dataRow['label'],
                                 $dataRow['value']);
                         else
-                            $resultsTable .= '<tr><td colspan="2">' . $dataRow['value'] . '</td></tr>';
+                            $resultsTable .= '<tr><td colspan="2">' .
+                                do_shortcode(\OES\Popup\render_for_frontend($dataRow['value'])) . '</td></tr>';
                     }
 
                 /* display row with results */
@@ -489,6 +491,7 @@ function oes_theme__display_search_results(array $results): void
                         $title . (empty($row['additional']) || !is_string($row['additional']) ? '' : $row['additional'])
                     );
             }
+        }
 
         if (!empty($containerString))
             printf('<div class="oes-search-archive-wrapper oes-archive-wrapper oes-post-type-filter oes-post-type-filter-%s">%s</div>',

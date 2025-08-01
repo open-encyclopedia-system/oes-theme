@@ -1,10 +1,16 @@
 /**
- * Theme Name:   OES
- * Description:  Exemplary Theme for the OES Project Plugin
- * Version: 2.3.0
- * Author: Maren Welterlich-Strobl, Freie Universität Berlin, Center für Digitale Systeme an der Universitätsbibliothek
- * License: GPLv2 or later
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Theme Name:        OES
+ * Theme URI:         https://www.open-encyclopedia-system.org/
+ * Description:       Exemplary (classic) Theme for the OES Project Plugin.
+ * Version:           2.3.2
+ * Author:            Maren Welterlich-Strobl, Freie Universität Berlin, FUB-IT
+ * Author URI:        https://www.it.fu-berlin.de/die-fub-it/mitarbeitende/mstrobl.html
+ * Requires at least: 6.5
+ * Tested up to:      6.8.2
+ * Requires PHP:      8.1
+ * Tags:              oes, theme, education, accessibility-ready
+ * License:           GPLv2 or later
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 /* ---------------------------------------------------------------------------------------------------------------------
@@ -48,34 +54,6 @@
     font-style: normal;
 }
 
-
-@font-face {
-    font-family: 'NexusSans';
-    src: url('assets/fonts/NexusSans-Regular.otf');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'NexusSans';
-    src: url('assets/fonts/NexusSans-BoldSC.otf');
-    font-weight: bold;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'NexusSans';
-    src: url('assets/fonts/NexusSans-Italic.otf');
-    font-weight: normal;
-    font-style: italic;
-}
-
-@font-face {
-    font-family: 'NexusSans';
-    src: url('assets/fonts/NexusSans-BoldItalic.otf');
-    font-weight: bold;
-    font-style: italic;
-}
 
 /* ---------------------------------------------------------------------------------------------------------------------
 -- GENERAL -------------------------------------------------------------------------------------------------------------
@@ -278,7 +256,6 @@ a.oes-disabled-link {
     border: 1px solid var(--oes-contrast);
     color: var(--oes-contrast);
     text-transform: uppercase;
-    font-family: 'NexusSans', serif;
 }
 
 .btn:focus {
@@ -795,7 +772,6 @@ header #oes-utility-nav ul li:last-child {
 
 header #oes-main-nav {
     text-transform: uppercase;
-    font-family: 'NexusSans', 'serif';
 }
 
 header #oes-main-nav li {
@@ -829,7 +805,6 @@ header #oes-main-nav ul li:last-child {
     margin: 1rem 0;
     display: inline-block;
     text-transform: uppercase;
-    font-family: 'NexusSans', 'serif';
     font-size: 1.25rem;
 }
 
@@ -993,7 +968,6 @@ ul.oes-filter-list-container li.active .oes-filter-item-count {
 
 ul.oes-filter-list-container li.active a {
     color: var(--oes-dark);
-    pointer-events: none !important;
 }
 
 /* Active Filter */
@@ -1066,7 +1040,6 @@ ul.oes-active-filter li a > span {
 .oes-sidebar-navigation {
     text-transform: uppercase;
     color: var(--oes-text-black);
-    font-family: 'NexusSans', 'serif';
 }
 
 ul.oes-breadcrumbs-list {
@@ -1537,7 +1510,6 @@ form#oes-search-form button:after {
 .oes-search-post-types ul li a {
     padding: 1rem;
     color: var(--oes-primary-contrast);
-    font-family: 'NexusSans', 'serif';
     text-transform: uppercase;
 }
 

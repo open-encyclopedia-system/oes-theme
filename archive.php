@@ -1,9 +1,9 @@
 <?php
 
-global $oes_archive_data;
+global $oes_archive;
 
 /* display header ----------------------------------------------------------------------------------------------------*/
-get_header(null, ['head-text' => strip_tags($oes_archive_data['archive']['page_title'] ?? '')]);
+get_header(null, ['head-text' => strip_tags($oes_archive['page_title'] ?? '')]);
 
 
 /* display main content ----------------------------------------------------------------------------------------------*/

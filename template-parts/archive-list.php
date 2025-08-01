@@ -13,13 +13,12 @@ if (!$oes_archive_displayed):
     if (!$oes_archive_skipped_posts) $oes_archive_skipped_posts = [];
 
     /* display empty results */
-    $tableArray = $oes_archive_data['table-array'] ?? [];
-    if (empty($tableArray) || count($tableArray) == 0) :
+    if (empty($oes_archive_data) || count($oes_archive_data) == 0) :
         echo oes_get_label('no_results_found', 'No results.');
 
     /* loop through table data -------------------------------------------------------------------------------------------*/
     else:
-        foreach ($tableArray as $characterArray) {
+        foreach ($oes_archive_data as $characterArray) {
 
             $thisCharacter = $characterArray['character'] === "#" ?
                 'other' :
@@ -33,7 +32,7 @@ if (!$oes_archive_displayed):
 
             /* loop through entries */
             $containerString = '';
-            foreach ($characterArray['table'] as $row)
+            foreach ($characterArray['table'] ?? [] as $row)
                 if (isset($row['id']) && !in_array($row['id'], $oes_archive_skipped_posts)) {
 
                     /* check if title is link */
