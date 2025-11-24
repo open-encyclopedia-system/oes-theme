@@ -88,10 +88,9 @@ if (!$oes_archive_displayed):
                 }
 
             if (!empty($containerString))
-                printf('<div class="oes-archive-wrapper oes-alphabet-filter-%s" data-alphabet="%s">%s' .
+                printf('<div class="oes-archive-wrapper" data-alphabet="%s">%s' .
                     '<div class="oes-alphabet-container">%s</div>' .
                     '</div>',
-                    $thisCharacter,
                     $thisCharacter,
                     $alphabetInitialString,
                     $containerString);

@@ -50,10 +50,6 @@ jQuery(document).ready(function () {
     });
 
 
-    /* Archive: check for pre-filter from url after loading page -----------------------------------------------------*/
-    oesFilter.filterFromURL();
-
-
     /* Resize columns ------------------------------------------------------------------------------------------------*/
     jQuery(".oes-resize-columns-6-6").on("click", function (event) {
         if(jQuery(this).attr('aria-expanded') === 'false') {
