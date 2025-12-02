@@ -472,7 +472,7 @@ function oes_theme__display_search_results(array $results): void
 
                 /* display row with results */
                 if ($resultsTable)
-                    $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-%s oes-post-filter-%s">' .
+                    $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-%s oes-post-filter-%s" data-post="%s">' .
                         '<a href="#row%s" data-toggle="collapse" aria-expanded="false" class="oes-archive-plus oes-toggle-down-before"></a>' .
                         '%s<div class="oes-archive-table-wrapper collapse" id="row%s">' .
                         '<table class="oes-archive-table oes-simple-table">%s' .
@@ -481,12 +481,14 @@ function oes_theme__display_search_results(array $results): void
                         ($row['language'] ?: 'all'),
                         $row['id'],
                         $row['id'],
+                        $row['id'],
                         $title . (is_string($row['additional']) ? $row['additional'] : ''),
                         $row['id'],
                         $resultsTable);
                 else
-                    $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-%s oes-post-filter-%s">%s</div>',
+                    $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-%s oes-post-filter-%s" data-post="%s">%s</div>',
                         ($row['language'] ?: 'all'),
+                        $row['id'],
                         $row['id'],
                         $title . (empty($row['additional']) || !is_string($row['additional']) ? '' : $row['additional'])
                     );

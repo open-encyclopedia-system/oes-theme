@@ -67,7 +67,7 @@ if (!$oes_archive_displayed):
 
                     /* display row with preview */
                     if ($previewTable)
-                        $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-%s oes-post-filter-%s">' .
+                        $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-%s oes-post-filter-%s" data-post="%s">' .
                             '<div class="oes-post-filter-wrapper-toggles">' .
                             '<a href="#row%s" data-toggle="collapse" aria-expanded="false" class="oes-archive-plus oes-toggle-down-before"></a>' .
                             '%s' .
@@ -76,12 +76,14 @@ if (!$oes_archive_displayed):
                             oes_get_post_language($row['id']) ?: 'all',
                             $row['id'],
                             $row['id'],
+                            $row['id'],
                             $title . (is_string($row['additional']) ? $row['additional'] : '') . $content,
                             $row['id'],
                             $previewTable);
                     elseif (!isset($args['skip-empty']) || !$args['skip-empty'])
-                        $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-%s oes-post-filter-%s">%s</div>',
+                        $containerString .= sprintf('<div class="oes-post-filter-wrapper oes-post-%s oes-post-filter-%s" data-post="%s">%s</div>',
                             oes_get_post_language($row['id']) ?: 'all',
+                            $row['id'],
                             $row['id'],
                             $title . (empty($row['additional']) || !is_string($row['additional']) ? '' : $row['additional']) . $content
                         );

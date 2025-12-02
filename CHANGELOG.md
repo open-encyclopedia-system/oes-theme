@@ -1,6 +1,9 @@
 
 # Changelog
 
+### 2.3.4
+- Fix: alphabet filter on archive pages
+
 ### 2.3.3
 - New: CHANGELOG.md
 - Improved: alphabet parameter in archive list
