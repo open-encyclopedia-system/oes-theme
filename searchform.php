@@ -15,6 +15,6 @@ if($oes_search) $searchTerm = (is_array($oes_search) && isset($oes_search['searc
 
     ?>
     <label for="s"></label>
-    <input type="text" name="s" id="s" value="<?php echo $searchTerm; ?>" required>
+    <input type="text" name="s" id="s" value="<?php echo esc_html($searchTerm); ?>" required>
     <button type="submit"></button>
 </form>
