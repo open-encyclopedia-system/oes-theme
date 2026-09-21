@@ -1,38 +1,46 @@
-# OES Theme
-Welcome to the Open Encyclopedia System (OES) Theme repository on GitHub.  
-OES is a modular and configurable software platform for creating, publishing, and maintaining online encyclopedias in the humanities and social sciences. It is designed to be accessible worldwide through Open Access.
+# Open Encyclopedia System — Theme (classic)
 
-For more information, please visit the [main repository](https://github.com/open-encyclopedia-system) or our [website](https://open-encyclopedia-system.org).
+This repository contains the **OES Theme** theme for the
+[Open Encyclopedia System (OES)](https://github.com/open-encyclopedia-system/oes-core) framework.
+It serves as an exemplary (classic) theme designed for an OES application plugin.
+
+[![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/open-encyclopedia-system/oes-theme/graphs/commit-activity)
+
+For general information about OES — what it is, its features, citation, contributing, credits, and licensing —
+see the [OES Core README](https://github.com/open-encyclopedia-system/oes-core#readme).
 
 A typical OES application consists of:
-- the **OES Core plugin**
-- an **application-specific OES plugin** that implements application-specific features
-- optional **OES modules**,
-- optional **OES theme**, such as this theme.
-
-The **OES Theme** serves as an exemplary block theme designed for an OES project plugin.
+- the **OES Core** plugin
+- an application-specific OES plugin that implements application-specific features
+- optional **OES modules**
+- optional **OES theme**, such as this one
 
 ## Dependencies
+
 This module depends on:
 
-- **OES Core**, version `2.3.3`  
-  Repository: [https://github.com/open-encyclopedia-system/oes-core](https://github.com/open-encyclopedia-system/oes-core)
-
-- **Advanced Custom Fields (ACF)**, version `6.3.4`  
-  Website: [https://www.advancedcustomfields.com](https://www.advancedcustomfields.com)
+| Component                    | Version   | Source                                                           |
+|------------------------------|-----------|------------------------------------------------------------------|
+| OES Core                     | `≥ 2.3.3` | [oes-core](https://github.com/open-encyclopedia-system/oes-core) |
+| Advanced Custom Fields (ACF) | `≥ 6.3.4` | [advancedcustomfields.com](https://www.advancedcustomfields.com) |
 
 ## Documentation
+
 The full user and technical manual is available at:
 [OES Manual](https://manual.open-encyclopedia-system.org/) *(German)*
 
-Additional documentation for this plugin, in this repository:
+Additional documentation for this theme, in this repository:
 
-- [CHANGELOG.md](./CHANGELOG.md) — release history for the OES Theme
+- [CHANGELOG.md](./CHANGELOG.md) — release history for the OES Block Theme
 
 ## Support
 
 This repository does not offer public support or issue tracking. For help using the OES plugins, contact:
 **info@open-encyclopedia-system.org**
+
+For information about available modules, customization options, or help launching your own encyclopedia, visit:
+[https://open-encyclopedia-system.org](https://open-encyclopedia-system.org)
 
 For general OES information — contributing and credits — see the
 [OES Core README](https://github.com/open-encyclopedia-system/oes-core#readme).
@@ -46,5 +54,6 @@ Funded by: **German Research Foundation (DFG)**
 ## Licensing
 
 This software is licensed under the **GNU General Public License (GPL v2 or later)**. See [LICENSE.txt](./LICENSE.txt)
-for the full license terms, or [https://www.gnu.org/licenses/old-licenses/gpl-2.0.html](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
+for the full license terms, or [https://www.gnu.org/licenses/gpl-2.0.html](https://www.gnu.org/licenses/gpl-2.0.html).
+
 
